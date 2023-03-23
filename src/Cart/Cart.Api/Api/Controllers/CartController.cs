@@ -1,5 +1,5 @@
 using Cart.Api.Api.Mappers.Abstractions;
-using Cart.Api.Core.Models.Exceptions;
+using Cart.Api.Core.Exceptions;
 using Cart.Api.Core.Services.Abstractions;
 using Microsoft.AspNetCore.Mvc;
 

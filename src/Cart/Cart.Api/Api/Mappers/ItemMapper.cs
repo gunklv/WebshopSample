@@ -6,13 +6,13 @@ namespace Cart.Api.Api.Mappers
 {
     public class ItemMapper : IItemMapper
     {
-        public ItemModel Map(Item item) => new ItemModel
+        public ItemViewModel Map(Item item) => new ItemViewModel
         {
             Id = item.Id,
             Name = item.Name,
             Price = item.Price,
             Quantity = item.Quantity,
-            Image = new ImageModel
+            Image = new ImageViewModel
             {
                 AltText = item.Image.AltText,
                 Url = item.Image.Url

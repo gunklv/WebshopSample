@@ -1,6 +1,6 @@
 ﻿using Cart.Api.Core.Abstractions.Repositories;
+using Cart.Api.Core.Exceptions;
 using Cart.Api.Core.Models;
-using Cart.Api.Core.Models.Exceptions;
 using Cart.Api.Core.Services;
 using Cart.Api.Core.Services.Abstractions;
 using Moq;

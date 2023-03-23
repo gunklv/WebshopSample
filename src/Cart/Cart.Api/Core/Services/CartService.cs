@@ -1,6 +1,8 @@
 ﻿using Cart.Api.Core.Abstractions.Repositories;
-using Cart.Api.Core.Models.Exceptions;
+using Cart.Api.Core.Exceptions;
+using Cart.Api.Core.Models;
 using Cart.Api.Core.Services.Abstractions;
+using Cart.Api.Core.Validators.Abstractions;
 using Domain = Cart.Api.Core.Models;
 
 namespace Cart.Api.Core.Services
@@ -8,10 +10,13 @@ namespace Cart.Api.Core.Services
     public class CartService : ICartService
     {
         private readonly ICartRepository _cartRepository;
+        private readonly IDomainValidator<Item> _itemValidator;
 
-        public CartService(ICartRepository cartRepository)
+        public CartService(IDomainValidator<Item> itemValidator,ICartRepository cartRepository)
         {
+
             _cartRepository = cartRepository;
+            _itemValidator = itemValidator;
         }
 
         public async Task AddItemToCartAsync(Guid cartId, int itemId)
@@ -34,6 +39,7 @@ namespace Cart.Api.Core.Services
             {
                 // Here could come a logic to collect Item data
                 var item = new Domain.Item { Id = itemId, Name = "DummyItem", Price = 1000, Quantity = 1, Image = new Domain.Image { AltText = "DummyAltText", Url = "DummyUrl" } };
+                await _itemValidator.EnsureValidityAsync(item);
 
                 cart.ItemList.Add(item);
             }
@@ -41,7 +47,7 @@ namespace Cart.Api.Core.Services
             await _cartRepository.UpdateCartAsync(cart);
         }
 
-        public async Task<IReadOnlyCollection<Domain.Item>> GetCartItemListAsync(Guid cartId)
+        public async Task<IReadOnlyCollection<Item>> GetCartItemListAsync(Guid cartId)
         {
             var cart = await _cartRepository.GetCartAsync(cartId);
 

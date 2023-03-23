@@ -39,7 +39,7 @@ namespace Cart.ComponentTests
             // step3: getting item list
             var itemListFirstResponse = await client.GetAsync($"carts/{cartId}/items");
             itemListFirstResponse.EnsureSuccessStatusCode();
-            var firstRequestitemModels = await itemListFirstResponse.Content.ReadFromJsonAsync<List<ItemModel>>();
+            var firstRequestitemModels = await itemListFirstResponse.Content.ReadFromJsonAsync<List<ItemViewModel>>();
             Assert.Equal(2, firstRequestitemModels.Count);
             Assert.Equal(firstItemId, firstRequestitemModels[0].Id);
             Assert.Equal(secondItemId, firstRequestitemModels[1].Id);
@@ -52,7 +52,7 @@ namespace Cart.ComponentTests
             // step5: getting modified item list
             var itemListSecondResponse = await client.GetAsync($"carts/{cartId}/items");
             itemListSecondResponse.EnsureSuccessStatusCode();
-            var secondRequestItemModel = await itemListSecondResponse.Content.ReadFromJsonAsync<List<ItemModel>>();
+            var secondRequestItemModel = await itemListSecondResponse.Content.ReadFromJsonAsync<List<ItemViewModel>>();
             Assert.Single(secondRequestItemModel);
             Assert.Equal(secondItemId, secondRequestItemModel[0].Id);
         }

@@ -1,4 +1,4 @@
-﻿namespace Cart.Api.Core.Models.Exceptions
+﻿namespace Cart.Api.Core.Exceptions
 {
     public class CartNotFoundException : Exception
     {

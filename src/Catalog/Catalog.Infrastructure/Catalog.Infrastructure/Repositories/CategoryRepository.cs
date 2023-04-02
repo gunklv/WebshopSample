@@ -45,7 +45,12 @@ namespace Catalog.Infrastructure.Repositories
             string commandText = $"SELECT * FROM {TableName} WHERE id = @id";
 
             var queryArguments = new { Id = id };
-            var categoryDto = await _npgsqlConnection.QueryFirstAsync<CategoryDto>(commandText, queryArguments);
+            var categoryDto = await _npgsqlConnection.QueryFirstOrDefaultAsync<CategoryDto>(commandText, queryArguments);
+
+            if(categoryDto == null)
+            {
+                return null;
+            }
 
             Category parentCategory = null;
             if(categoryDto.ParentId != null)

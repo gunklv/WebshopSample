@@ -2,6 +2,7 @@ using Catalog.Api.Attributes;
 using Catalog.Api.Exceptions;
 using Catalog.Api.Mappers.Abstractions;
 using Catalog.Api.Models.Category.Requests;
+using Catalog.Api.Utilities.Hateoas.Attributes;
 using Catalog.Application.Category.Commands.DeleteCategory;
 using Catalog.Application.Category.Queries.GetCategory;
 using Catalog.Application.Category.Queries.ListCategories;
@@ -24,7 +25,11 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody] CreateCategoryRequest createCategoryRequest)
+        [Route("", Name = "CreateCategory")]
+        [Link(nameof(GetCategoryAsync), "categoryId")]
+        [Link(nameof(UpdateCategoryAsync), "categoryId")]
+        [Link(nameof(DeleteCategoryAsync), "categoryId")]
+        public async Task<IActionResult> CreateCategoryAsync([FromBody] CreateCategoryRequest createCategoryRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -32,33 +37,41 @@ namespace Catalog.Api.Controllers
             }
 
             var createCategoryCommand = _categoryMapper.Map(createCategoryRequest);
-            await _mediator.Send(createCategoryCommand);
+            var category = await _mediator.Send(createCategoryCommand);
 
-            return StatusCode(StatusCodes.Status201Created);
+            var categoryViewModel = _categoryMapper.Map(category);
+
+            return StatusCode(StatusCodes.Status201Created, categoryViewModel);
         }
 
         [HttpGet]
-        [Route("{categoryId}")]
-        public async Task<IActionResult> GetAsync([FromRoute][NotDefault] Guid categoryId)
+        [Route("{categoryId}", Name = "GetCategory")]
+        [Link(nameof(GetCategoryAsync), "categoryId")]
+        [Link(nameof(UpdateCategoryAsync), "categoryId")]
+        [Link(nameof(DeleteCategoryAsync), "categoryId")]
+        public async Task<IActionResult> GetCategoryAsync([FromRoute][NotDefault] Guid categoryId)
         {
             var category = await _mediator.Send(new GetCategoryQuery { Id = categoryId });
-            var categoryDto = _categoryMapper.Map(category);
+            var categoryViewModel = _categoryMapper.Map(category);
 
-            return Ok(categoryDto);
+            return Ok(categoryViewModel);
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListAsync()
+        public async Task<IActionResult> ListCategoriesAsync()
         {
             var categories = await _mediator.Send(new ListCategoriesQuery());
-            var categoryDtoList = categories.Select(category => _categoryMapper.Map(category));
+            var categoryViewModelList = categories.Select(category => _categoryMapper.Map(category));
 
-            return Ok(categoryDtoList);
+            return Ok(categoryViewModelList);
         }
 
         [HttpPut]
-        [Route("{categoryId}")]
-        public async Task<IActionResult> UpdateAsync([FromRoute][NotDefault] Guid categoryId, [FromBody] UpdateCategoryRequest updateCategoryRequest)
+        [Route("{categoryId}", Name = "UpdateCategory")]
+        [Link(nameof(GetCategoryAsync), "categoryId")]
+        [Link(nameof(UpdateCategoryAsync), "categoryId")]
+        [Link(nameof(DeleteCategoryAsync), "categoryId")]
+        public async Task<IActionResult> UpdateCategoryAsync([FromRoute][NotDefault] Guid categoryId, [FromBody] UpdateCategoryRequest updateCategoryRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -66,18 +79,21 @@ namespace Catalog.Api.Controllers
             }
 
             var updateCategoryCommand = _categoryMapper.Map(categoryId, updateCategoryRequest);
-            await _mediator.Send(updateCategoryCommand);
+            var category = await _mediator.Send(updateCategoryCommand);
 
-            return Ok();
+            var categoryViewModel = _categoryMapper.Map(category);
+
+            return Ok(categoryViewModel);
         }
 
         [HttpDelete]
-        [Route("{categoryId}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute][NotDefault] Guid categoryId)
+        [Route("{categoryId}", Name="DeleteCategory")]
+        [Link(nameof(CreateCategoryAsync), "")]
+        public async Task<IActionResult> DeleteCategoryAsync([FromRoute][NotDefault] Guid categoryId)
         {
             await _mediator.Send(new DeleteCategoryCommand { Id = categoryId });
 
-            return Ok();
+            return Ok(new { });
         }
     }
 }

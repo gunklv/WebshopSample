@@ -6,9 +6,9 @@ namespace Catalog.Application.Item.Queries.GetItem
 {
     internal class GetItemQueryHandler : IRequestHandler<GetItemQuery, Domain.Aggregates.Item>
     {
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
 
-        public GetItemQueryHandler(IRepository<Domain.Aggregates.Item> itemRepository)
+        public GetItemQueryHandler(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }

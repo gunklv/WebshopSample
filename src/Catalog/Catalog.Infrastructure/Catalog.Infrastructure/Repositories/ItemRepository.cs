@@ -1,4 +1,5 @@
 ﻿using Catalog.Domain.Abstractions;
+using Catalog.Domain.Abstractions.Filters;
 using Catalog.Domain.Aggregates;
 using Catalog.Infrastructure.Configurations;
 using Catalog.Infrastructure.Mappers.Abstractions;
@@ -9,7 +10,7 @@ using Npgsql;
 
 namespace Catalog.Infrastructure.Repositories
 {
-    internal class ItemRepository : IRepository<Item>
+    internal class ItemRepository : IItemRepository
     {
         private const string TableName = "item";
         private readonly NpgsqlConnection _npgsqlConnection;
@@ -27,9 +28,10 @@ namespace Catalog.Infrastructure.Repositories
             _itemMapper = itemMapper;
         }
 
-        public async Task InsertAsync(Item item)
+        public async Task<Item> InsertAsync(Item item)
         {
-            var sql = $"INSERT INTO {TableName} (categoryId, name, description, imageUrl, price, amount) VALUES (@categoryId, @name, @description, @imageUrl, @price, @amount)";
+            var sql = $"INSERT INTO {TableName} (categoryId, name, description, imageUrl, price, amount) " +
+                $"VALUES (@categoryId, @name, @description, @imageUrl, @price, @amount) RETURNING id";
 
             var queryArguments = new ItemDto
             {
@@ -41,7 +43,9 @@ namespace Catalog.Infrastructure.Repositories
                 Amount = item.Amount
             };
 
-            await _npgsqlConnection.ExecuteAsync(sql, queryArguments);
+            var id = await _npgsqlConnection.ExecuteScalarAsync<long>(sql, queryArguments);
+
+            return new Item(id, item.Name, item.Description, item.ImageUrl, item.Price, item.Amount, item.Category);
         }
 
         public async Task<Item> GetByIdAsync(object id)
@@ -64,7 +68,27 @@ namespace Catalog.Infrastructure.Repositories
 
         public async Task<IReadOnlyCollection<Item>> GetAllAsync()
         {
+            return await GetAllAsync(null, null, null);
+        }
+
+        public async Task<IReadOnlyCollection<Item>> GetAllAsync(Action<ItemFilter> itemFilterAction, int? page, int? limit)
+        {
             string commandText = $"SELECT * FROM {TableName}";
+
+            if (itemFilterAction != null)
+            {
+                var itemFilter = new ItemFilter();
+                itemFilterAction.Invoke(itemFilter);
+                if(itemFilter.CategoryId != null)
+                {
+                    commandText += $" WHERE CategoryId = '{itemFilter.CategoryId}'";
+                }
+            }
+
+            if(page != null && page != 0 && limit != null && limit != 0)
+            {
+                commandText += $" LIMIT {limit} OFFSET {(page - 1) * limit}";
+            }
 
             var itemDtos = (await _npgsqlConnection.QueryAsync<ItemDto>(commandText)).ToList();
             var items = new List<Item>();
@@ -86,7 +110,7 @@ namespace Catalog.Infrastructure.Repositories
             return items;
         }
 
-        public async Task UpdateAsync(Item item)
+        public async Task<Item> UpdateAsync(Item item)
         {
             var commandText = $@"UPDATE {TableName}
                 SET categoryId = @categoryId, name = @name, description = @description, imageUrl = @imageUrl, price = @price, amount = @amount
@@ -104,6 +128,8 @@ namespace Catalog.Infrastructure.Repositories
             };
 
             await _npgsqlConnection.ExecuteAsync(commandText, queryArguments);
+
+            return new Item(item.Id, item.Name, item.Description, item.ImageUrl, item.Price, item.Amount, item.Category);
         }
 
         public async Task DeleteAsync(object id)

@@ -4,20 +4,20 @@ using MediatR;
 
 namespace Catalog.Application.Item.Commands.UpdateItem
 {
-    internal class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand>
+    internal class UpdateItemCommandHandler : IRequestHandler<UpdateItemCommand, Domain.Aggregates.Item>
     {
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
         private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
 
         public UpdateItemCommandHandler(
-            IRepository<Domain.Aggregates.Item> itemRepository,
+            IItemRepository itemRepository,
             IRepository<Domain.Aggregates.Category> categoryRepository)
         {
             _itemRepository = itemRepository;
             _categoryRepository = categoryRepository;
         }
 
-        public async Task Handle(UpdateItemCommand updateItemCommand, CancellationToken cancellationToken)
+        public async Task<Domain.Aggregates.Item> Handle(UpdateItemCommand updateItemCommand, CancellationToken cancellationToken)
         {
             var item = await _itemRepository.GetByIdAsync(updateItemCommand.Id);
             if (item == null)
@@ -36,7 +36,7 @@ namespace Catalog.Application.Item.Commands.UpdateItem
             item.Amount = updateItemCommand.Amount;
             item.Category = category;
 
-            await _itemRepository.UpdateAsync(item);
+            return await _itemRepository.UpdateAsync(item);
         }
     }
 }

@@ -24,9 +24,9 @@ namespace Catalog.Infrastructure.Repositories
             _categoryMapper = categoryMapper;
         }
 
-        public async Task InsertAsync(Category category)
+        public async Task<Category> InsertAsync(Category category)
         {
-            var sql = $"INSERT INTO {TableName} (parentId, name, imageUrl) VALUES (@parentId, @name, @imageUrl)";
+            var sql = $"INSERT INTO {TableName} (parentId, name, imageUrl) VALUES (@parentId, @name, @imageUrl) RETURNING id";
 
             var queryArguments = new
             {
@@ -35,7 +35,9 @@ namespace Catalog.Infrastructure.Repositories
                 imageUrl = category.ImageUrl
             };
 
-            await _npgsqlConnection.ExecuteAsync(sql, queryArguments);
+            var id = await _npgsqlConnection.ExecuteScalarAsync<Guid>(sql, queryArguments);
+
+            return new Category(id, category.Name, category.ImageUrl, category.ParentCategory);
         }
 
         public async Task<Category> GetByIdAsync(object id)
@@ -93,7 +95,7 @@ namespace Catalog.Infrastructure.Repositories
             return category;
         }
 
-        public async Task UpdateAsync(Category category)
+        public async Task<Category> UpdateAsync(Category category)
         {
             var commandText = $@"UPDATE {TableName}
                 SET parentId = @parentId, name = @name, imageUrl = @imageUrl
@@ -102,12 +104,14 @@ namespace Catalog.Infrastructure.Repositories
             var queryArguments = new
             {
                 id = category.Id,
-                parentId = category.ParentCategory.Id,
+                parentId = category.ParentCategory?.Id,
                 name = category.Name,
                 imageUrl = category.ImageUrl
             };
 
             await _npgsqlConnection.ExecuteAsync(commandText, queryArguments);
+
+            return new Category(category.Id, category.Name, category.ImageUrl, category.ParentCategory);
         }
 
         public async Task DeleteAsync(object id)

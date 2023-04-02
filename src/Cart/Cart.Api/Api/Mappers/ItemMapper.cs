@@ -8,14 +8,24 @@ namespace Cart.Api.Api.Mappers
     {
         public ItemViewModel Map(Item item) => new ItemViewModel
         {
-            Id = item.Id,
+            ItemId = item.Id,
             Name = item.Name,
             Price = item.Price,
             Quantity = item.Quantity,
-            Image = new ImageViewModel
+            ImageAltText = item.Image.AltText,
+            ImageUrl = item.Image.Url
+        };
+
+        public Item Map(AddItemToCartRequest addItemToCartRequest) => new Item
+        {
+            Id = addItemToCartRequest.ItemId,
+            Name = addItemToCartRequest.Name,
+            Price = addItemToCartRequest.Price,
+            Quantity = 1,
+            Image = new Image
             {
-                AltText = item.Image.AltText,
-                Url = item.Image.Url
+                AltText = addItemToCartRequest.ImageAltText,
+                Url = addItemToCartRequest.ImageUrl
             }
         };
     }

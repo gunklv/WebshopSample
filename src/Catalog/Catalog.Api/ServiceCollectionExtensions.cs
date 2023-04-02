@@ -1,8 +1,11 @@
 ﻿using Catalog.Api.Mappers;
 using Catalog.Api.Mappers.Abstractions;
+using Catalog.Api.Utilities.Hateoas;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Routing;
 
 namespace Catalog.Api
 {
@@ -19,7 +22,9 @@ namespace Catalog.Api
             serviceCollection.AddValidatorsFromAssemblies(AppDomain.CurrentDomain.GetAssemblies().Where(p => !p.IsDynamic));
 
             serviceCollection.AddSingleton<IItemMapper, ItemMapper>();
-            serviceCollection.AddSingleton<ICategoryMapper, CategoryMapper>();
+            serviceCollection.AddScoped<ICategoryMapper, CategoryMapper>();
+
+            serviceCollection.AddHateoas();
         }
     }
 }

@@ -4,7 +4,6 @@ using Catalog.Application.Category.Commands.UpdateCategory;
 using Catalog.Application.Category.Commands.CreateCategory;
 using Catalog.Api.Models.Category.ViewModels;
 using Catalog.Api.Mappers.Abstractions;
-
 namespace Catalog.Api.Mappers
 {
     public class CategoryMapper : ICategoryMapper
@@ -29,7 +28,7 @@ namespace Catalog.Api.Mappers
         public CategoryViewModel Map(Category category)
         => new CategoryViewModel
         {
-            Id = category.Id,
+            CategoryId = category.Id,
             ParentId = category.ParentCategory?.Id,
             Name = category.Name,
             ImageUrl = category.ImageUrl

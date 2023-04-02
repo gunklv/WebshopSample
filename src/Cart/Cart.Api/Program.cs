@@ -20,10 +20,6 @@ namespace Cart.Api
 
             builder.Services.Configure<PersistenceConfiguration>(builder.Configuration.GetSection("Persistence"));
 
-            builder.Services.AddSingleton<IItemMapper, ItemMapper>();
-            builder.Services.AddSingleton<ICartRepository, CartRepository>();
-            builder.Services.AddScoped<ICartService, CartService>();
-
             var app = builder.Build();
 
             app.UseSwagger();

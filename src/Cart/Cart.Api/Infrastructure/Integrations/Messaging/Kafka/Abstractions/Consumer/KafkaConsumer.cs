@@ -98,9 +98,6 @@ namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.Abstractions.Cons
                 }
             }
 
-            //var configDictionary = ((IEnumerable<KeyValuePair<string, string>>)(object)config).ToDictionary(x => x.Key, x => x.Value);
-            //configDictionary["enable.auto.commit"] = "false";
-
             var consumer = new ConsumerBuilder<Ignore, TMessage>(config)
                 .SetValueDeserializer(new KafkaMessageDeserializer<TMessage>())
                 .SetErrorHandler((_, error) =>

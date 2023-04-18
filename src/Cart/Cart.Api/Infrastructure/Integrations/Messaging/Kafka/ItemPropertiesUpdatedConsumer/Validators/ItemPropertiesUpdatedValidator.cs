@@ -9,6 +9,7 @@ namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpd
     {
         public ItemPropertiesUpdatedValidator()
         {
+            RuleFor(m => m.ItemId).Must(BeAValidLong);
             RuleFor(m => m.CategoryId).Must(BeAValidGuid);
             RuleFor(m => m.Price).Must(BeAValidDecimal);
             RuleFor(m => m.Amount).Must(BeAValidLong);

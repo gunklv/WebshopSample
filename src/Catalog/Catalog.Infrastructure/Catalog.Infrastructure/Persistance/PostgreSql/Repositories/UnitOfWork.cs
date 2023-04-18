@@ -50,6 +50,7 @@ namespace Catalog.Infrastructure.Persistance.PostgreSql.Repositories
             {
                 await PublishDomainEventsAsync();
                 await PublishIntegrationEventsAsync();
+                await ClearDomainEventsAsync();
 
                 _dbTransaction.Commit();
 
@@ -106,6 +107,17 @@ namespace Catalog.Infrastructure.Persistance.PostgreSql.Repositories
                         await _integrationEventOutboxRepository.InsertAsync(integrationEvent);
                 }
             }
+        }
+
+        private async Task ClearDomainEventsAsync()
+        {
+            var changedAggregateRoots = _changeTracker.GetChangedAggregateRoots();
+
+            foreach(var changedAggregateRoot in changedAggregateRoots)
+            {
+                changedAggregateRoot.ClearDomainEvents();
+            }
+            await Task.CompletedTask;
         }
     }
 }

@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Catalog.Application.Category.Commands.CreateCategory
 {
-    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand>
+    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Domain.Aggregates.Category>
     {
         private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
 
@@ -13,7 +13,7 @@ namespace Catalog.Application.Category.Commands.CreateCategory
             _categoryRepository = categoryRepository;
         }
 
-        public async Task Handle(CreateCategoryCommand createCategoryCommand, CancellationToken cancellationToken)
+        public async Task<Domain.Aggregates.Category> Handle(CreateCategoryCommand createCategoryCommand, CancellationToken cancellationToken)
         {
             Domain.Aggregates.Category parentCategory = null;
             if (createCategoryCommand.ParentId != null)
@@ -26,7 +26,9 @@ namespace Catalog.Application.Category.Commands.CreateCategory
 
             var category = new Domain.Aggregates.Category(null, createCategoryCommand.Name, createCategoryCommand.ImageUrl, parentCategory);
 
-            await _categoryRepository.InsertAsync(category);
+            var insertedCategory = await _categoryRepository.InsertAsync(category);
+
+            return insertedCategory;
         }
     }
 }

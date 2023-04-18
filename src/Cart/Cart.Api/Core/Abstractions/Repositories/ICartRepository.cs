@@ -6,10 +6,10 @@ namespace Cart.Api.Core.Abstractions.Repositories
     {
         Task InsertCartAsync(Domain.Cart cart);
 
-        Task<Domain.Cart> GetCartAsync(Guid cartId);
+        Task<Domain.Cart> GetCartAsync(string cartKey);
 
         Task UpdateCartAsync(Domain.Cart cart);
 
-        Task DeleteCartAsync(Guid cartId);
+        Task DeleteCartAsync(string cartKey);
     }
 }

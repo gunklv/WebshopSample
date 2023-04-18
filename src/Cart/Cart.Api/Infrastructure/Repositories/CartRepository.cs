@@ -18,7 +18,7 @@ namespace Cart.Api.Infrastructure.Repositories
             BsonClassMap.RegisterClassMap<Domain.Cart>(m =>
             {
                 m.AutoMap();
-                m.MapIdMember(d => d.Id).SetSerializer(new GuidSerializer(BsonType.String));
+                m.MapIdMember(d => d.Key).SetSerializer(new StringSerializer(BsonType.String));
             });
 
             var database = new MongoClient(configuration.Value.ConnectionString).GetDatabase(configuration.Value.DatabaseName);
@@ -30,20 +30,20 @@ namespace Cart.Api.Infrastructure.Repositories
             await _collection.InsertOneAsync(cart);
         }
 
-        public async Task<Domain.Cart> GetCartAsync(Guid cartId)
+        public async Task<Domain.Cart> GetCartAsync(string key)
         {
-            var cursor = await _collection.FindAsync(c => c.Id == cartId);
+            var cursor = await _collection.FindAsync(c => c.Key == key);
             return cursor.FirstOrDefault();
         }
 
         public async Task UpdateCartAsync(Domain.Cart cart)
         {
-            await _collection.ReplaceOneAsync(c => c.Id == cart.Id, cart, new ReplaceOptions { IsUpsert = false });
+            await _collection.ReplaceOneAsync(c => c.Key == cart.Key, cart, new ReplaceOptions { IsUpsert = false });
         }
 
-        public async Task DeleteCartAsync(Guid cartId)
+        public async Task DeleteCartAsync(string key)
         {
-            await _collection.DeleteOneAsync(c => c.Id == cartId);
+            await _collection.DeleteOneAsync(c => c.Key == key);
         }
     }
 }

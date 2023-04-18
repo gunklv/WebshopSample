@@ -6,8 +6,8 @@ namespace Catalog.Domain.Abstractions
     {
         Task<IReadOnlyCollection<T>> GetAllAsync();
         Task<T> GetByIdAsync(object id);
-        Task InsertAsync(T obj);
-        Task UpdateAsync(T obj);
+        Task<T> InsertAsync(T obj);
+        Task<T> UpdateAsync(T obj);
         Task DeleteAsync(object id);
     }
 }

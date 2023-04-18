@@ -4,20 +4,20 @@ using MediatR;
 
 namespace Catalog.Application.Item.Commands.CreateItem
 {
-    internal class CreateItemCommandHandler : IRequestHandler<CreateItemCommand>
+    internal class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, Domain.Aggregates.Item>
     {
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
         private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
 
         public CreateItemCommandHandler(
-            IRepository<Domain.Aggregates.Item> itemRepository,
+            IItemRepository itemRepository,
             IRepository<Domain.Aggregates.Category> categoryRepository)
         {
             _itemRepository = itemRepository;
             _categoryRepository = categoryRepository;
         }
 
-        public async Task Handle(CreateItemCommand createItemCommand, CancellationToken cancellationToken)
+        public async Task<Domain.Aggregates.Item> Handle(CreateItemCommand createItemCommand, CancellationToken cancellationToken)
         {
             var category = await _categoryRepository.GetByIdAsync(createItemCommand.CategoryId);
             if (category == null)
@@ -27,7 +27,7 @@ namespace Catalog.Application.Item.Commands.CreateItem
             var item = new Domain.Aggregates.Item(
                 null, createItemCommand.Name, createItemCommand.Description, createItemCommand.ImageUrl, createItemCommand.Price, createItemCommand.Amount, category);
 
-            await _itemRepository.InsertAsync(item);
+            return await _itemRepository.InsertAsync(item);
         }
     }
 }

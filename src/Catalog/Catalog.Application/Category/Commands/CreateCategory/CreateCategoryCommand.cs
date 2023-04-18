@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Category.Commands.CreateCategory
 {
-    public class CreateCategoryCommand : IRequest
+    public class CreateCategoryCommand : IRequest<Domain.Aggregates.Category>
     {
         public Guid? ParentId { get; set; }
         public string Name { get; set; }

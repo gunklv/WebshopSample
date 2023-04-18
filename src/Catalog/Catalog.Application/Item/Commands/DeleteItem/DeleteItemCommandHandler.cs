@@ -7,9 +7,9 @@ namespace Catalog.Application.Shared.DeleteItem
 {
     internal class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand>
     {
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
 
-        public DeleteItemCommandHandler(IRepository<Domain.Aggregates.Item> itemRepository)
+        public DeleteItemCommandHandler(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }

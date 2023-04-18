@@ -2,9 +2,9 @@ using Catalog.Api.Attributes;
 using Catalog.Api.Exceptions;
 using Catalog.Api.Mappers.Abstractions;
 using Catalog.Api.Models.Item.Requests;
+using Catalog.Api.Utilities.Hateoas.Attributes;
 using Catalog.Application.Item.Commands.DeleteItem;
 using Catalog.Application.Item.Queries.GetItem;
-using Catalog.Application.Item.Queries.ListItems;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -24,7 +24,11 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateAsync([FromBody]CreateItemRequest createItemRequest)
+        [Route("", Name = "CreateItem")]
+        [Link(nameof(GetItemAsync), "itemId")]
+        [Link(nameof(UpdateItemAsync), "itemId")]
+        [Link(nameof(DeleteItemAsync), "itemId")]
+        public async Task<IActionResult> CreateItemAsync([FromBody]CreateItemRequest createItemRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -32,14 +36,19 @@ namespace Catalog.Api.Controllers
             }
 
             var createItemCommand = _itemMapper.Map(createItemRequest);
-            await _mediator.Send(createItemCommand);
+            var item =await _mediator.Send(createItemCommand);
 
-            return StatusCode(StatusCodes.Status201Created);
+            var itemViewModel = _itemMapper.Map(item);
+
+            return StatusCode(StatusCodes.Status201Created, itemViewModel);
         }
 
         [HttpGet]
-        [Route("{itemId}")]
-        public async Task<IActionResult> GetAsync([FromRoute][NotDefault] long itemId)
+        [Route("{itemId}", Name = "GetItem")]
+        [Link(nameof(GetItemAsync), "itemId")]
+        [Link(nameof(UpdateItemAsync), "itemId")]
+        [Link(nameof(DeleteItemAsync), "itemId")]
+        public async Task<IActionResult> GetItemAsync([FromRoute][NotDefault] long itemId)
         {
             var item = await _mediator.Send(new GetItemQuery { Id = itemId });
             var itemDto = _itemMapper.Map(item);
@@ -48,17 +57,22 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> ListAsync()
+        public async Task<IActionResult> ListItemsAsync([FromQuery] ListItemsQueryRequest listItemsQueryRequest)
         {
-            var items = await _mediator.Send(new ListItemsQuery());
-            var itemDtoList = items.Select(item => _itemMapper.Map(item));
+            var listItemsQuery = _itemMapper.Map(listItemsQueryRequest);
 
-            return Ok(itemDtoList);
+            var items = await _mediator.Send(listItemsQuery);
+            var itemViewModelCollection = items.Select(item => _itemMapper.Map(item));
+
+            return Ok(itemViewModelCollection);
         }
 
         [HttpPut]
-        [Route("{itemId}")]
-        public async Task<IActionResult> UpdateAsync([FromRoute][NotDefault] long itemId, [FromBody] UpdateItemRequest updateItemRequest)
+        [Route("{itemId}", Name = "UpdateItem")]
+        [Link(nameof(GetItemAsync), "itemId")]
+        [Link(nameof(UpdateItemAsync), "itemId")]
+        [Link(nameof(DeleteItemAsync), "itemId")]
+        public async Task<IActionResult> UpdateItemAsync([FromRoute][NotDefault] long itemId, [FromBody] UpdateItemRequest updateItemRequest)
         {
             if (!ModelState.IsValid)
             {
@@ -66,18 +80,21 @@ namespace Catalog.Api.Controllers
             }
 
             var updateItemCommand = _itemMapper.Map(itemId, updateItemRequest);
-            await _mediator.Send(updateItemCommand);
+            var item = await _mediator.Send(updateItemCommand);
 
-            return Ok();
+            var itemViewModel = _itemMapper.Map(item);
+
+            return Ok(itemViewModel);
         }
 
         [HttpDelete]
-        [Route("{itemId}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute][NotDefault] long itemId)
+        [Route("{itemId}", Name = "DeleteItem")]
+        [Link(nameof(CreateItemAsync), "")]
+        public async Task<IActionResult> DeleteItemAsync([FromRoute][NotDefault] long itemId)
         {
             await _mediator.Send(new DeleteItemCommand { Id = itemId });
 
-            return Ok();
+            return Ok(new { });
         }
     }
 }

@@ -6,5 +6,6 @@ namespace Cart.Api.Api.Mappers.Abstractions
     public interface IItemMapper
     {
         ItemViewModel Map(Item item);
+        Item Map(AddItemToCartRequest addItemToCartRequest);
     }
 }

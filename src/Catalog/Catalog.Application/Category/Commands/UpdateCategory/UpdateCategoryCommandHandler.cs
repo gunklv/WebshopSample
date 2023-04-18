@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Catalog.Application.Category.Commands.UpdateCategory
 {
-    internal class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand>
+    internal class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Domain.Aggregates.Category>
     {
         private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
 
@@ -13,7 +13,7 @@ namespace Catalog.Application.Category.Commands.UpdateCategory
             _categoryRepository = categoryRepository;
         }
 
-        public async Task Handle(UpdateCategoryCommand updateCategoryCommand, CancellationToken cancellationToken)
+        public async Task<Domain.Aggregates.Category> Handle(UpdateCategoryCommand updateCategoryCommand, CancellationToken cancellationToken)
         {
             var category = await _categoryRepository.GetByIdAsync(updateCategoryCommand.Id);
 
@@ -34,7 +34,7 @@ namespace Catalog.Application.Category.Commands.UpdateCategory
             category.ImageUrl = updateCategoryCommand.ImageUrl;
             category.ParentCategory = parentCategory;
 
-            await _categoryRepository.UpdateAsync(category);
+            return await _categoryRepository.UpdateAsync(category);
         }
     }
 }

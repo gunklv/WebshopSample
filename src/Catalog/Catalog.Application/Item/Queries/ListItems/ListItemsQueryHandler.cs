@@ -5,16 +5,21 @@ namespace Catalog.Application.Item.Queries.ListItems
 {
     internal class ListItemsQueryHandler : IRequestHandler<ListItemsQuery, IReadOnlyCollection<Domain.Aggregates.Item>>
     {
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
 
-        public ListItemsQueryHandler(IRepository<Domain.Aggregates.Item> itemRepository)
+        public ListItemsQueryHandler(IItemRepository itemRepository)
         {
             _itemRepository = itemRepository;
         }
 
         public async Task<IReadOnlyCollection<Domain.Aggregates.Item>> Handle(ListItemsQuery listItemsQuery, CancellationToken cancellationToken)
         {
-            return (await _itemRepository.GetAllAsync()).ToList();
+            var items = (await _itemRepository.GetAllAsync(
+                itemFilterAction: x => x.CategoryId = listItemsQuery.ListItemsFilter?.CategoryId,
+                page: listItemsQuery.PagedQueryParams.Page,
+                limit: listItemsQuery.PagedQueryParams.Limit)).ToList();
+
+            return items;
         }
     }
 }

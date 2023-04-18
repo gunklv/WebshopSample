@@ -1,12 +1,11 @@
 ﻿using Cart.Api.Core.Models;
-using Domain = Cart.Api.Core.Models;
 
 namespace Cart.Api.Core.Services.Abstractions
 {
     public interface ICartService
     {
-        Task AddItemToCartAsync(Guid cartId, int itemId);
-        Task<IReadOnlyCollection<Item>> GetCartItemListAsync(Guid cartId);
-        Task RemoveItemFromCartAsync(Guid cartId, int itemId);
+        Task AddItemToCartAsync(string cartKey, Item item);
+        Task<IReadOnlyCollection<Item>> GetCartItemListAsync(string cartKey);
+        Task RemoveItemFromCartAsync(string cartKey, long itemId);
     }
 }

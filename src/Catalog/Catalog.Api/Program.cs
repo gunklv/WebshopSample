@@ -1,4 +1,5 @@
 using Catalog.Api.Middlewares;
+using Catalog.Api.Utilities.Hateoas;
 using Catalog.Application;
 using Catalog.Infrastructure;
 using Catalog.Infrastructure.Configurations;
@@ -11,17 +12,17 @@ namespace Catalog.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers();
+            builder.Services.AddControllers(options => {
+                options.OutputFormatters.Add(new HalJsonMediaTypeFormatter());
+            });
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
-
-            builder.Services.Configure<PersistenceConfiguration>(builder.Configuration.GetSection("Persistence"));
 
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
             builder.Services.AddApi();
             builder.Services.AddApplication();
-            builder.Services.AddInfrastructure();
+            builder.Services.AddInfrastructure(builder.Configuration);
 
             var app = builder.Build();
 
@@ -31,8 +32,6 @@ namespace Catalog.Api
             app.UseMiddleware<ExceptionHandlingMiddleware>();
 
             app.UseHttpsRedirection();
-
-            app.UseAuthorization();
 
             app.MapControllers();
 

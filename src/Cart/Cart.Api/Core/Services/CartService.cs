@@ -14,22 +14,23 @@ namespace Cart.Api.Core.Services
 
         public CartService(IDomainValidator<Item> itemValidator,ICartRepository cartRepository)
         {
-
             _cartRepository = cartRepository;
             _itemValidator = itemValidator;
         }
 
-        public async Task AddItemToCartAsync(Guid cartId, int itemId)
+        public async Task AddItemToCartAsync(string cartKey, Item item)
         {
-            var cart = await _cartRepository.GetCartAsync(cartId);
+            await _itemValidator.EnsureValidityAsync(item);
+
+            var cart = await _cartRepository.GetCartAsync(cartKey);
 
             if(cart == null)
             {
-                cart = new Domain.Cart { Id = cartId };
+                cart = new Domain.Cart { Key = cartKey };
                 await _cartRepository.InsertCartAsync(cart);
             }
 
-            var cartItem = cart.ItemList.FirstOrDefault(x => x.Id == itemId);
+            var cartItem = cart.ItemList.FirstOrDefault(x => x.Id == item.Id);
 
             if (cartItem != null)
             {
@@ -37,35 +38,31 @@ namespace Cart.Api.Core.Services
             }
             else
             {
-                // Here could come a logic to collect Item data
-                var item = new Domain.Item { Id = itemId, Name = "DummyItem", Price = 1000, Quantity = 1, Image = new Domain.Image { AltText = "DummyAltText", Url = "DummyUrl" } };
-                await _itemValidator.EnsureValidityAsync(item);
-
                 cart.ItemList.Add(item);
             }
 
             await _cartRepository.UpdateCartAsync(cart);
         }
 
-        public async Task<IReadOnlyCollection<Item>> GetCartItemListAsync(Guid cartId)
+        public async Task<IReadOnlyCollection<Item>> GetCartItemListAsync(string cartKey)
         {
-            var cart = await _cartRepository.GetCartAsync(cartId);
+            var cart = await _cartRepository.GetCartAsync(cartKey);
 
             if (cart == null)
             {
-                throw new CartNotFoundException($"Cart with id: {cartId} do not exist.");
+                throw new CartNotFoundException($"Cart with key: {cartKey} do not exist.");
             }
 
             return cart.ItemList;
         }
 
-        public async Task RemoveItemFromCartAsync(Guid cartId, int itemId)
+        public async Task RemoveItemFromCartAsync(string cartKey, long itemId)
         {
-            var cart = await _cartRepository.GetCartAsync(cartId);
+            var cart = await _cartRepository.GetCartAsync(cartKey);
 
             if(cart == null)
             {
-                throw new CartNotFoundException($"Cart with id: {cartId} do not exist.");
+                throw new CartNotFoundException($"Cart with key: {cartKey} do not exist.");
             }
 
             var removableItem = cart.ItemList.FirstOrDefault(x => x.Id == itemId);
@@ -84,7 +81,7 @@ namespace Cart.Api.Core.Services
 
             if (!cart.ItemList.Any())
             {
-                await _cartRepository.DeleteCartAsync(cartId);
+                await _cartRepository.DeleteCartAsync(cartKey);
             }
             else
             {

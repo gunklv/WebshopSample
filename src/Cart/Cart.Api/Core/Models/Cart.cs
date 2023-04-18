@@ -2,7 +2,7 @@
 {
     public class Cart
     {
-        public Guid Id { get; set; }
+        public string Key { get; set; }
         public List<Item> ItemList { get; set; } = new();
     }
 }

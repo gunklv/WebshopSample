@@ -7,11 +7,11 @@ namespace Catalog.Application.Category.Commands.DeleteCategory
     internal class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand>
     {
         private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
-        private readonly IRepository<Domain.Aggregates.Item> _itemRepository;
+        private readonly IItemRepository _itemRepository;
 
         public DeleteCategoryCommandHandler(
             IRepository<Domain.Aggregates.Category> categoryRepository,
-            IRepository<Domain.Aggregates.Item> itemRepository)
+            IItemRepository itemRepository)
         {
             _categoryRepository = categoryRepository;
             _itemRepository = itemRepository;
@@ -25,9 +25,12 @@ namespace Catalog.Application.Category.Commands.DeleteCategory
                     $"Could not found Category with id: {deleteCategoryCommand.Id} for deleting Category.");
 
             var items = await _itemRepository.GetAllAsync();
+            var itemsAssignedToCategory = items.Where(i => i.Category.Id== category.Id);
 
-            if(items.Any(i => i.Category.Id== category.Id))
-                throw new CategoryCanNotBeDeletedException($"Category with id {category.Id} are assigned to Item(s).");
+            foreach(var item in itemsAssignedToCategory)
+            {
+                await _itemRepository.DeleteAsync(item);
+            }
 
             await _categoryRepository.DeleteAsync(deleteCategoryCommand.Id);
         }

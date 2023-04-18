@@ -9,6 +9,7 @@ namespace Cart.Api.Core.Validators
     {
         public ItemValidator()
         {
+            RuleFor(m => m.Id).NotEmpty();
             RuleFor(m => m.Name).NotEmpty();
         }
 

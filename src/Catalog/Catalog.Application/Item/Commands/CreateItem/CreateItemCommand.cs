@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Item.Commands.CreateItem
 {
-    public class CreateItemCommand : IRequest
+    public class CreateItemCommand : IRequest<Domain.Aggregates.Item>
     {
         public Guid CategoryId { get; set; }
         public string Name { get; set; }

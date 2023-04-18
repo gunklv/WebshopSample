@@ -1,8 +1,8 @@
 ﻿using Catalog.Application.Shared;
-using Catalog.Infrastructure.Persistance.Sql.Mappers;
-using Catalog.Infrastructure.Persistance.Sql.Mappers.Abstractions;
-using Catalog.Infrastructure.Persistance.Sql.Repositories;
-using Catalog.Infrastructure.Persistance.Sql.Repositories.Utils;
+using Catalog.Infrastructure.Persistance.PostgreSql.Repositories;
+using Catalog.Infrastructure.Persistance.PostgreSql.Repositories.Mappers;
+using Catalog.Infrastructure.Persistance.PostgreSql.Repositories.Mappers.Abstractions;
+using Catalog.Infrastructure.Persistance.PostgreSql.Repositories.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Npgsql;

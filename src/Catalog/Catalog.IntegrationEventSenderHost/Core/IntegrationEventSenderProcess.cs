@@ -1,5 +1,5 @@
 ﻿using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Messaging.Kafka.CatalogIntegrationEventProducer;
-using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Repositories.Abstractions;
+using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Persistance.PostgreSql.Repositories.Abstractions;
 
 namespace Catalog.IntegrationEventSenderHost.Core
 {

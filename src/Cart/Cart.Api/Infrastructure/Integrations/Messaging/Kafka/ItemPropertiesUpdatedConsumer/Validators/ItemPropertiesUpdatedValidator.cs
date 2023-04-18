@@ -1,6 +1,6 @@
-﻿using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Exceptions;
+﻿using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.IntegrationEventConsumer.Exceptions;
 using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Models;
-using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Validators.Abstractions;
+using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.IntegrationEventConsumer.Validators.Abstractions;
 using FluentValidation;
 
 namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Validators

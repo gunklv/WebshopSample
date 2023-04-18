@@ -121,6 +121,6 @@ namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.Abstractions.Cons
         }
 
         private bool IsMessageTypeValid(ConsumeResult<Ignore, TMessage> consumeResult)
-            => consumeResult.Message.Headers.FirstOrDefault(header => header.Key == "Type").GetValue() == _messageType;
+            => consumeResult.Message.Headers.FirstOrDefault(header => header.Key == "EventType").GetValue() == _messageType;
     }
 }

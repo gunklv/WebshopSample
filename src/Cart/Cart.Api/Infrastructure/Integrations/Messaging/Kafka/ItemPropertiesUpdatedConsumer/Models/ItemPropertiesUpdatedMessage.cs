@@ -1,10 +1,10 @@
 ﻿using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.Abstractions.Attributes;
-using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.Abstractions.Consumer.Models;
+using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.IntegrationEventConsumer.Models;
 
 namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Models
 {
     [MessageType("ItemPropertiesUpdated")]
-    internal class ItemPropertiesUpdatedMessage : KafkaConsumeMessage
+    internal class ItemPropertiesUpdatedMessage : IntegrationEventConsumeMessage
     {
         public string ItemId { get; set; }
         public string CategoryId { get; set; }

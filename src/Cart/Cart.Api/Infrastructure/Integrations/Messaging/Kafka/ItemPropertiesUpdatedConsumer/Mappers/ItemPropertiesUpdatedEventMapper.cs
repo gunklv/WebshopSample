@@ -1,5 +1,5 @@
 ﻿using Cart.Api.Core.IntegrationEvents.Events;
-using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Mappers.Abstractions;
+using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.IntegrationEventConsumer.Mappers.Abstractions;
 using Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Models;
 
 namespace Cart.Api.Infrastructure.Integrations.Messaging.Kafka.ItemPropertiesUpdatedConsumer.Mappers

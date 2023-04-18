@@ -36,6 +36,11 @@ namespace Cart.Api.Infrastructure.Repositories
             return cursor.FirstOrDefault();
         }
 
+        public async Task<IReadOnlyCollection<Domain.Cart>> GetAllCartsAsync()
+        {
+            return await _collection.AsQueryable().ToListAsync();
+        }
+
         public async Task UpdateCartAsync(Domain.Cart cart)
         {
             await _collection.ReplaceOneAsync(c => c.Key == cart.Key, cart, new ReplaceOptions { IsUpsert = false });

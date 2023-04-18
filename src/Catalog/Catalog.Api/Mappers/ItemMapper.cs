@@ -5,7 +5,7 @@ using Catalog.Application.Item.Commands.CreateItem;
 using Catalog.Application.Item.Commands.UpdateItem;
 using Catalog.Application.Item.Queries.ListItems;
 using Catalog.Application.Shared.Models;
-using Catalog.Domain.Aggregates;
+using Catalog.Domain.ItemAggregate;
 
 namespace Catalog.Api.Mappers
 {
@@ -38,7 +38,7 @@ namespace Catalog.Api.Mappers
         => new ItemViewModel
         {
             ItemId = item.Id,
-            CategoryId = item.Category.Id,
+            CategoryId = item.CategoryId,
             Name = item.Name,
             Description = item.Description,
             ImageUrl = item.ImageUrl,

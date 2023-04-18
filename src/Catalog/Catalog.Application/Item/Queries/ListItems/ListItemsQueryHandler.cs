@@ -1,25 +1,34 @@
-﻿using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
 using MediatR;
 
 namespace Catalog.Application.Item.Queries.ListItems
 {
-    internal class ListItemsQueryHandler : IRequestHandler<ListItemsQuery, IReadOnlyCollection<Domain.Aggregates.Item>>
+    internal class ListItemsQueryHandler : IRequestHandler<ListItemsQuery, IReadOnlyCollection<Domain.ItemAggregate.Item>>
     {
-        private readonly IItemRepository _itemRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ListItemsQueryHandler(IItemRepository itemRepository)
+        public ListItemsQueryHandler(IUnitOfWork unitOfWork)
         {
-            _itemRepository = itemRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<IReadOnlyCollection<Domain.Aggregates.Item>> Handle(ListItemsQuery listItemsQuery, CancellationToken cancellationToken)
+        public async Task<IReadOnlyCollection<Domain.ItemAggregate.Item>> Handle(ListItemsQuery listItemsQuery, CancellationToken cancellationToken)
         {
-            var items = (await _itemRepository.GetAllAsync(
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                var items = (await _unitOfWork.ItemRepository.GetAllAsync(
                 itemFilterAction: x => x.CategoryId = listItemsQuery.ListItemsFilter?.CategoryId,
                 page: listItemsQuery.PagedQueryParams.Page,
                 limit: listItemsQuery.PagedQueryParams.Limit)).ToList();
 
-            return items;
+                return items;
+            }
+            catch(Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

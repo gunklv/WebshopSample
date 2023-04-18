@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Category.Queries.ListCategories
 {
-    public class ListCategoriesQuery : IRequest<IReadOnlyCollection<Domain.Aggregates.Category>>
+    public class ListCategoriesQuery : IRequest<IReadOnlyCollection<Domain.CategoryAggregate.Category>>
     {
     }
 }

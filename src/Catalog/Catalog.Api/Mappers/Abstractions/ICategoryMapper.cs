@@ -2,7 +2,7 @@
 using Catalog.Api.Models.Category.ViewModels;
 using Catalog.Application.Category.Commands.CreateCategory;
 using Catalog.Application.Category.Commands.UpdateCategory;
-using Catalog.Domain.Aggregates;
+using Catalog.Domain.CategoryAggregate;
 
 namespace Catalog.Api.Mappers.Abstractions
 {

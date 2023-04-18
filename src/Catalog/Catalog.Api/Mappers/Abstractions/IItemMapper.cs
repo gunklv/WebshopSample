@@ -3,7 +3,7 @@ using Catalog.Api.Models.Item.ViewModels;
 using Catalog.Application.Item.Commands.CreateItem;
 using Catalog.Application.Item.Commands.UpdateItem;
 using Catalog.Application.Item.Queries.ListItems;
-using Catalog.Domain.Aggregates;
+using Catalog.Domain.ItemAggregate;
 
 namespace Catalog.Api.Mappers.Abstractions
 {

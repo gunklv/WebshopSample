@@ -1,38 +1,39 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Category.Commands.DeleteCategory
 {
     internal class DeleteCategoryCommandHandler : IRequestHandler<DeleteCategoryCommand>
     {
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
-        private readonly IItemRepository _itemRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteCategoryCommandHandler(
-            IRepository<Domain.Aggregates.Category> categoryRepository,
-            IItemRepository itemRepository)
+        public DeleteCategoryCommandHandler(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
-            _itemRepository = itemRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(DeleteCategoryCommand deleteCategoryCommand, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetByIdAsync(deleteCategoryCommand.Id);
-            if (category == null)
-                throw new CategoryNotFoundException(
-                    $"Could not found Category with id: {deleteCategoryCommand.Id} for deleting Category.");
-
-            var items = await _itemRepository.GetAllAsync();
-            var itemsAssignedToCategory = items.Where(i => i.Category.Id== category.Id);
-
-            foreach(var item in itemsAssignedToCategory)
+            await _unitOfWork.BeginAsync();
+            try
             {
-                await _itemRepository.DeleteAsync(item);
-            }
+                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(deleteCategoryCommand.Id);
+                if (category == null)
+                    throw new CategoryNotFoundException(
+                        $"Could not found Category with id: {deleteCategoryCommand.Id} for deleting Category.");
 
-            await _categoryRepository.DeleteAsync(deleteCategoryCommand.Id);
+                category.MarkDeleted();
+
+                await _unitOfWork.CategoryRepository.DeleteAsync(category);
+
+                await _unitOfWork.CommitAsync();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

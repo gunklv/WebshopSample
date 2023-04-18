@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Category.Commands.UpdateCategory
 {
-    public class UpdateCategoryCommand : IRequest<Domain.Aggregates.Category>
+    public class UpdateCategoryCommand : IRequest<Domain.CategoryAggregate.Category>
     {
         public Guid Id { get; set; }
         public Guid? ParentId { get; set; }

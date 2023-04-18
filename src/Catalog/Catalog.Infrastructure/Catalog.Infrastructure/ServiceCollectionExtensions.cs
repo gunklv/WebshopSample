@@ -1,11 +1,12 @@
-﻿using Catalog.Domain.Abstractions;
-using Catalog.Domain.Aggregates;
-using Catalog.Infrastructure.Configurations;
-using Catalog.Infrastructure.Mappers;
-using Catalog.Infrastructure.Mappers.Abstractions;
-using Catalog.Infrastructure.Repositories;
+﻿using Catalog.Application.Shared;
+using Catalog.Infrastructure.Persistance.Sql.Mappers;
+using Catalog.Infrastructure.Persistance.Sql.Mappers.Abstractions;
+using Catalog.Infrastructure.Persistance.Sql.Repositories;
+using Catalog.Infrastructure.Persistance.Sql.Repositories.Utils;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
+using System.Reflection;
 
 namespace Catalog.Infrastructure
 {
@@ -13,13 +14,15 @@ namespace Catalog.Infrastructure
     {
         public static void AddInfrastructure(this IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            serviceCollection.AddOptions<PersistenceConfiguration>().Bind(configuration.GetSection("Persistence"));
+            serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblies(Assembly.GetAssembly(typeof(ServiceCollectionExtensions))));
+
+            serviceCollection.AddTransient((s) => new NpgsqlConnection(configuration.GetValue<string>("Persistence:ConnectionString")));
+
+            serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
+            serviceCollection.AddSingleton<IChangeTracker, ChangeTracker>();
 
             serviceCollection.AddSingleton<ICategoryMapper, CategoryMapper>();
             serviceCollection.AddSingleton<IItemMapper, ItemMapper>();
-
-            serviceCollection.AddScoped<IItemRepository, ItemRepository>();
-            serviceCollection.AddScoped<IRepository<Category>, CategoryRepository>();
         }
     }
 }

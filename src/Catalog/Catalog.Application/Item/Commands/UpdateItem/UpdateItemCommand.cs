@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Item.Commands.UpdateItem
 {
-    public class UpdateItemCommand : IRequest<Domain.Aggregates.Item>
+    public class UpdateItemCommand : IRequest<Domain.ItemAggregate.Item>
     {
         public long Id { get; set; }
         public Guid CategoryId { get; set; }

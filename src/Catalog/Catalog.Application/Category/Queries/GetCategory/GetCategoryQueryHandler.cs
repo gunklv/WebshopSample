@@ -1,26 +1,35 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Category.Queries.GetCategory
 {
-    internal class GetCategoryQueryHandler : IRequestHandler<GetCategoryQuery, Domain.Aggregates.Category>
+    internal class GetCategoryQueryHandler : IRequestHandler<GetCategoryQuery, Domain.CategoryAggregate.Category>
     {
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetCategoryQueryHandler(IRepository<Domain.Aggregates.Category> categoryRepository)
+        public GetCategoryQueryHandler(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Domain.Aggregates.Category> Handle(GetCategoryQuery getCategoryQuery, CancellationToken cancellationToken)
+        public async Task<Domain.CategoryAggregate.Category> Handle(GetCategoryQuery getCategoryQuery, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetByIdAsync(getCategoryQuery.Id);
-            if (category == null)
-                throw new CategoryNotFoundException(
-                    $"Could not found Category with id: {getCategoryQuery.Id}.");
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(getCategoryQuery.Id);
+                if (category == null)
+                    throw new CategoryNotFoundException(
+                        $"Could not found Category with id: {getCategoryQuery.Id}.");
 
-            return category;
+                return category;
+            }
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

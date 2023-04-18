@@ -2,7 +2,6 @@ using Catalog.Api.Middlewares;
 using Catalog.Api.Utilities.Hateoas;
 using Catalog.Application;
 using Catalog.Infrastructure;
-using Catalog.Infrastructure.Configurations;
 
 namespace Catalog.Api
 {

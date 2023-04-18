@@ -1,9 +1,10 @@
-﻿using Catalog.Domain.Aggregates;
-using Catalog.Api.Models.Category.Requests;
+﻿using Catalog.Api.Models.Category.Requests;
 using Catalog.Application.Category.Commands.UpdateCategory;
 using Catalog.Application.Category.Commands.CreateCategory;
 using Catalog.Api.Models.Category.ViewModels;
 using Catalog.Api.Mappers.Abstractions;
+using Catalog.Domain.CategoryAggregate;
+
 namespace Catalog.Api.Mappers
 {
     public class CategoryMapper : ICategoryMapper

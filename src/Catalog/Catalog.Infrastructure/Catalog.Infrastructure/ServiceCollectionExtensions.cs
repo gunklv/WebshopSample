@@ -16,7 +16,7 @@ namespace Catalog.Infrastructure
         {
             serviceCollection.AddMediatR(c => c.RegisterServicesFromAssemblies(Assembly.GetAssembly(typeof(ServiceCollectionExtensions))));
 
-            serviceCollection.AddTransient((s) => new NpgsqlConnection(configuration.GetValue<string>("Persistence:ConnectionString")));
+            serviceCollection.AddTransient((s) => new NpgsqlConnection(configuration.GetValue<string>("PostgreSqlConfiguration:ConnectionString")));
 
             serviceCollection.AddScoped<IUnitOfWork, UnitOfWork>();
             serviceCollection.AddSingleton<IChangeTracker, ChangeTracker>();

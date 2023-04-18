@@ -1,5 +1,6 @@
 ﻿using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Messaging.Kafka.CatalogIntegrationEventProducer;
 using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Persistance.PostgreSql.Repositories.Abstractions;
+using Microsoft.Extensions.Logging;
 
 namespace Catalog.IntegrationEventSenderHost.Core
 {
@@ -9,13 +10,16 @@ namespace Catalog.IntegrationEventSenderHost.Core
 
         private readonly IIntegrationEventOutboxRepository _integrationEventOutboxRepository;
         private readonly ICatalogIntegrationEventMessageProducer _catalogIntegrationEventMessageProducer;
+        private readonly ILogger<IntegrationEventSenderProcess> _logger;
 
         public IntegrationEventSenderProcess(
             IIntegrationEventOutboxRepository integrationEventOutboxRepository,
-            ICatalogIntegrationEventMessageProducer catalogIntegrationEventMessageProducer)
+            ICatalogIntegrationEventMessageProducer catalogIntegrationEventMessageProducer,
+            ILogger<IntegrationEventSenderProcess> logger)
         {
             _integrationEventOutboxRepository = integrationEventOutboxRepository;
             _catalogIntegrationEventMessageProducer = catalogIntegrationEventMessageProducer;
+            _logger = logger;
         }
 
         public async Task RunAsync(CancellationToken cancellatonToken)
@@ -28,7 +32,7 @@ namespace Catalog.IntegrationEventSenderHost.Core
                 {
                     await _catalogIntegrationEventMessageProducer.PublishEvent(integrationEvent);
 
-                    Console.WriteLine($"Event with id [{integrationEvent.EventId}] and type [{integrationEvent.EventType}] has been published.");
+                    _logger.LogInformation($"Event with id [{integrationEvent.EventId}] and type [{integrationEvent.EventType}] has been published.");
 
                     integrationEvent.ProcessedOn = DateTime.UtcNow;
                     await _integrationEventOutboxRepository.UpdateIntegrationEventAsync(integrationEvent);

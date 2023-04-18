@@ -6,6 +6,7 @@ using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Persistance
 using Catalog.IntegrationEventSenderHost.Infrastructure.Integrations.Persistance.PostgreSql.Repositories.Abstractions;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Npgsql;
 
 namespace Catalog.IntegrationEventSenderHost
@@ -49,7 +50,9 @@ namespace Catalog.IntegrationEventSenderHost
 
         private static IServiceCollection ConfigureServices(IServiceCollection serviceCollection, IConfiguration configuration)
         {
-            serviceCollection.AddTransient((s) => new NpgsqlConnection(configuration.GetValue<string>("Persistence:ConnectionString")));
+            serviceCollection.AddLogging(configure => configure.AddConsole());
+
+            serviceCollection.AddTransient((s) => new NpgsqlConnection(configuration.GetValue<string>("PostgreSqlConfiguration:ConnectionString")));
 
             serviceCollection.AddSingleton<IIntegrationEventSenderProcess, IntegrationEventSenderProcess>();
             serviceCollection.AddScoped<IKafkaProducer<CatalogIntegrationEventProducerConfiguration>, KafkaProducer<CatalogIntegrationEventProducerConfiguration>>();

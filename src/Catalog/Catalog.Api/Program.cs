@@ -2,6 +2,9 @@ using Catalog.Api.Middlewares;
 using Catalog.Api.Utilities.Hateoas;
 using Catalog.Application;
 using Catalog.Infrastructure;
+using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
+using System.Security.Claims;
 
 namespace Catalog.Api
 {
@@ -11,11 +14,62 @@ namespace Catalog.Api
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            builder.Services.AddControllers(options => {
+            builder.Services.AddAuthentication("Bearer")
+                .AddJwtBearer("Bearer", options =>
+                {
+                    options.Authority = "https://localhost:5001";
+
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateAudience = false
+                    };
+                });
+
+            builder.Services.AddAuthorization(options =>
+            {
+                options.AddPolicy("RequireManagerOrBuyerRole", policy =>
+                {
+                    policy.RequireAuthenticatedUser();
+                    policy.RequireClaim(ClaimTypes.Role, "Manager", "Buyer");
+                });
+            });
+
+            builder.Services.AddControllers(options =>
+            {
                 options.OutputFormatters.Add(new HalJsonMediaTypeFormatter());
             });
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new OpenApiInfo { Title = "Catalog Api", Version = "v1" });
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Name = "Authorization",
+                    Description = "JWT Authorization header using the Bearer scheme.\r\n\r\nEnter 'Bearer' [space] and then your token in the text input below.\r\n\r\nExample: 'Bearer 12345abcdef'",
+                    In = ParameterLocation.Header,
+                    Type = SecuritySchemeType.ApiKey,
+                    Scheme = "Bearer",
+                    BearerFormat = "JWT"
+                });
+
+                c.AddSecurityRequirement(new OpenApiSecurityRequirement()
+                {
+                    {
+                        new OpenApiSecurityScheme
+                        {
+                        Reference = new OpenApiReference
+                            {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                            },
+                            Scheme = "oauth2",
+                            Name = "Bearer",
+                            In = ParameterLocation.Header
+                        },
+                        new List<string>()
+                    }
+                });
+            });
 
             builder.Services.AddTransient<ExceptionHandlingMiddleware>();
 
@@ -25,6 +79,9 @@ namespace Catalog.Api
 
             var app = builder.Build();
 
+            app.UseAuthentication();
+            app.UseAuthorization();
+
             app.UseSwagger();
             app.UseSwaggerUI();
 
@@ -32,7 +89,7 @@ namespace Catalog.Api
 
             app.UseHttpsRedirection();
 
-            app.MapControllers();
+            app.MapControllers().RequireAuthorization("RequireManagerOrBuyerRole");
 
             app.Run();
         }

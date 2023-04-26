@@ -34,11 +34,25 @@ services:
       - db:/var/lib/postgresql/catalog-data
       - ./docker-entrypoint-initdb.d/postgres-catalog-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
       
+  postgres-identity:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_DB: identity
+      POSTGRES_USER: admin
+      POSTGRES_PASSWORD: admin
+      
+    ports:
+      - '5433:5432'
+    volumes: 
+      - db:/var/lib/postgresql/identity-data
+
   pgadmin:
     image: dpage/pgadmin4
     restart: always
     depends_on:
       - postgres-catalog
+      - postgres-identity
     environment:
       PGADMIN_DEFAULT_EMAIL: admin@admin.com
       PGADMIN_DEFAULT_PASSWORD: admin

@@ -1,6 +1,3 @@
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.IdentityModel.Tokens;
-
 namespace MvcClient
 {
     public class Program
@@ -9,7 +6,8 @@ namespace MvcClient
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
+            builder.Services.AddRazorPages();
+
             builder.Services.AddAuthentication(options =>
                 {
                     options.DefaultScheme = "Cookies";
@@ -20,24 +18,21 @@ namespace MvcClient
                 {
                     options.Authority = "https://localhost:5001";
 
-                    options.ClientId = "mvc";
+                    options.ClientId = "identityClient";
                     options.ClientSecret = "secret";
                     options.ResponseType = "code";
 
                     options.SaveTokens = true;
 
                     options.Scope.Clear();
+                    options.Scope.Add("offline_access");
                     options.Scope.Add("openid");
-                    //options.Scope.Add("profile");
-                    //options.Scope.Add("offline_access");
+                    options.Scope.Add("name");
                     options.Scope.Add("roles");
-
-                    options.ClaimActions.MapJsonKey("role", "role");
+                    options.Scope.Add("role");
 
                     options.GetClaimsFromUserInfoEndpoint = true;
                 });
-
-            builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
 
@@ -55,12 +50,9 @@ namespace MvcClient
             app.UseAuthentication();
             app.UseAuthorization();
 
-            app.UseEndpoints(endpoints =>
-            {
-                endpoints
-                    .MapDefaultControllerRoute()
-                    .RequireAuthorization();
-            });
+            app.UseAuthorization();
+
+            app.MapRazorPages();
 
             app.Run();
         }

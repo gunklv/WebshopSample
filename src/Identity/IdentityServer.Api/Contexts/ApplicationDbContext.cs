@@ -5,9 +5,9 @@ using IdentityServer.Models;
 
 namespace IdentityServer.Contexts
 {
-    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
+    public class AccountDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
+        public AccountDbContext(DbContextOptions<AccountDbContext> options)
             : base(options)
         {
         }

@@ -4,7 +4,7 @@
 
 using System.ComponentModel.DataAnnotations;
 
-namespace src.Pages.Login;
+namespace IdentityServer.Api.Pages.Login;
 
 public class InputModel
 {
@@ -13,8 +13,6 @@ public class InputModel
         
     [Required]
     public string Password { get; set; }
-        
-    public bool RememberLogin { get; set; }
         
     public string ReturnUrl { get; set; }
 

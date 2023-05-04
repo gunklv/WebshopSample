@@ -11,7 +11,8 @@ public static class Config
         {
             new IdentityResources.OpenId(),
             new IdentityResources.Profile(),
-            new IdentityResource("role", new List<string> { JwtClaimTypes.Role })
+            new IdentityResource("role", new List<string> { JwtClaimTypes.Role }),
+            new IdentityResource("name", new List<string> { JwtClaimTypes.Name })
         };
 
     public static IEnumerable<ApiScope> ApiScopes =>
@@ -31,7 +32,7 @@ public static class Config
         {
             new Client
             {
-                ClientId = "mvc",
+                ClientId = "identityClient",
                 ClientSecrets = { new Secret("secret".Sha256()) },
                 AllowedGrantTypes = GrantTypes.Code,
                 RedirectUris = { "https://localhost:7254/signin-oidc" },
@@ -41,10 +42,13 @@ public static class Config
                 {
                     IdentityServerConstants.StandardScopes.OpenId,
                     IdentityServerConstants.StandardScopes.Profile,
-                    "roles"
+                    "name",
+                    "roles",
+                    "role"
                 },
                 AlwaysIncludeUserClaimsInIdToken = true,
-                AlwaysSendClientClaims = true
+                AlwaysSendClientClaims = true,
+                AccessTokenLifetime = 1800
             }
         };
 }

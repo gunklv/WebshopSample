@@ -1,13 +1,11 @@
-using Duende.IdentityServer.Services;
 using IdentityServer.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
-namespace src.Pages.Register;
+namespace IdentityServer.Api.Pages.Register;
 
-[SecurityHeaders]
 [AllowAnonymous]
 public class Index : PageModel
 {
@@ -25,7 +23,7 @@ public class Index : PageModel
         _roleManager = roleManager;
     }
 
-    public async Task<IActionResult> OnGet()
+    public IActionResult OnGet()
     {
         return Page();
     }

@@ -4,7 +4,6 @@ using Catalog.Application;
 using Catalog.Infrastructure;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using System.Security.Claims;
 
 namespace Catalog.Api
 {
@@ -25,14 +24,7 @@ namespace Catalog.Api
                     };
                 });
 
-            builder.Services.AddAuthorization(options =>
-            {
-                options.AddPolicy("RequireManagerOrBuyerRole", policy =>
-                {
-                    policy.RequireAuthenticatedUser();
-                    policy.RequireClaim(ClaimTypes.Role, "Manager", "Buyer");
-                });
-            });
+            builder.Services.AddAuthorization();
 
             builder.Services.AddControllers(options =>
             {
@@ -89,7 +81,7 @@ namespace Catalog.Api
 
             app.UseHttpsRedirection();
 
-            app.MapControllers().RequireAuthorization("RequireManagerOrBuyerRole");
+            app.MapControllers();
 
             app.Run();
         }

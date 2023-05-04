@@ -1,0 +1,40 @@
+﻿@page
+@model IndexModel
+@{
+    ViewData["Title"] = "IdentityClient";
+}
+
+@using System.Security.Claims;
+@{
+    var claims = HttpContext.User?.Claims;
+    var name = claims?.FirstOrDefault(x => x.Type == ClaimTypes.Name)?.Value;
+    var role = claims?.FirstOrDefault(x => x.Type == ClaimTypes.Role)?.Value;
+}
+
+<div class="welcome-page">
+    <h1>
+        Welcome to IdentityClient
+        @if (name != null)
+        {
+            <span>- @Html.Raw(name) [@Html.Raw(role)] </span>
+        }
+    </h1>
+
+    <ul>
+        @if(claims.Any())
+        {
+            <li>
+                Click <a href="~/account/profile">here</a> to check profile.
+            </li>
+        }
+        else
+        {
+            <li>
+                Click <a href="~/account/profile">here</a> to login.
+            </li>
+        }
+        <li>
+            Click <a href="~/catalog/items">here</a> to get catalog items.
+        </li>
+    </ul>
+</div>

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 namespace IdentityServer.Data.Migrations.IdentityServer.AccountDb
 {
-    [DbContext(typeof(ApplicationDbContext))]
+    [DbContext(typeof(AccountDbContext))]
     [Migration("20230424165119_InitialAccountConfigurationDbMigration")]
     partial class InitialAccountConfigurationDbMigration
     {

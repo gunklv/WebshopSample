@@ -7,6 +7,7 @@ using Catalog.Application.Category.Commands.DeleteCategory;
 using Catalog.Application.Category.Queries.GetCategory;
 using Catalog.Application.Category.Queries.ListCategories;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Api.Controllers
@@ -25,6 +26,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         [Route("", Name = "CreateCategory")]
         [Link(nameof(GetCategoryAsync), "categoryId")]
         [Link(nameof(UpdateCategoryAsync), "categoryId")]
@@ -45,6 +47,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Manager, Buyer")]
         [Route("{categoryId}", Name = "GetCategory")]
         [Link(nameof(GetCategoryAsync), "categoryId")]
         [Link(nameof(UpdateCategoryAsync), "categoryId")]
@@ -58,6 +61,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Manager, Buyer")]
         public async Task<IActionResult> ListCategoriesAsync()
         {
             var categories = await _mediator.Send(new ListCategoriesQuery());
@@ -67,6 +71,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Manager")]
         [Route("{categoryId}", Name = "UpdateCategory")]
         [Link(nameof(GetCategoryAsync), "categoryId")]
         [Link(nameof(UpdateCategoryAsync), "categoryId")]
@@ -87,6 +92,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Manager")]
         [Route("{categoryId}", Name="DeleteCategory")]
         [Link(nameof(CreateCategoryAsync), "")]
         public async Task<IActionResult> DeleteCategoryAsync([FromRoute][NotDefault] Guid categoryId)

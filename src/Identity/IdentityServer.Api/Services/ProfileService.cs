@@ -47,7 +47,6 @@ namespace IdentityServer.Api.Services
                     }
                 }
             }
-
             context.IssuedClaims = claims;
         }
 

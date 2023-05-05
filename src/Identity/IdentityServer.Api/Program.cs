@@ -1,4 +1,4 @@
-﻿using IdentityServer;
+﻿using IdentityServer.Api.Configuration;
 using IdentityServer.Api.Services;
 using IdentityServer.Contexts;
 using IdentityServer.Models;
@@ -22,38 +22,41 @@ try
         .Enrich.FromLogContext()
         .ReadFrom.Configuration(ctx.Configuration));
 
-        builder.Services.AddRazorPages();
+    builder.Services.AddRazorPages();
 
-        var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
-        const string connectionString = @"Server=localhost:5433; Username=admin; Password=admin; Database=identity";
+    var migrationsAssembly = typeof(Program).GetTypeInfo().Assembly.GetName().Name;
+    var connectionString = builder.Configuration.GetValue<string>("AccountConfiguration:ConnectionString");
 
-        builder.Services.AddDbContext<AccountDbContext>(options => options.UseNpgsql(connectionString));
+    builder.Services.AddDbContext<AccountDbContext>(options => options.UseNpgsql(connectionString));
 
-        builder.Services
-            .AddIdentity<ApplicationUser, IdentityRole>()
-            .AddEntityFrameworkStores<AccountDbContext>()
-            .AddDefaultTokenProviders();
+    builder.Services
+        .AddIdentity<ApplicationUser, IdentityRole>()
+        .AddEntityFrameworkStores<AccountDbContext>()
+        .AddDefaultTokenProviders();
 
-        builder.Services
-            .AddIdentityServer()
-            .AddInMemoryIdentityResources(Config.IdentityResources)
-            .AddInMemoryApiScopes(Config.ApiScopes)
-            .AddInMemoryClients(Config.Clients)
-            .AddInMemoryApiResources(Config.ApiResources)
-            .AddProfileService<ProfileService>()
-            .AddAspNetIdentity<ApplicationUser>();
+    var identityConfiguration = new IdentityConfiguration();
+    builder.Configuration.GetSection("IdentityConfiguration").Bind(identityConfiguration);
 
-        var app = builder.Build();
+    builder.Services
+        .AddIdentityServer()
+        .AddInMemoryIdentityResources(InMemoryConfig.IdentityResources)
+        .AddInMemoryApiScopes(InMemoryConfig.ApiScopes)
+        .AddInMemoryClients(InMemoryConfig.Clients(identityConfiguration))
+        .AddInMemoryApiResources(InMemoryConfig.ApiResources)
+        .AddProfileService<ProfileService>()
+        .AddAspNetIdentity<ApplicationUser>();
 
-        app.UseSerilogRequestLogging();
+    var app = builder.Build();
 
-        app.UseStaticFiles();
-        app.UseRouting();
+    app.UseSerilogRequestLogging();
 
-        app.UseIdentityServer();
+    app.UseStaticFiles();
+    app.UseRouting();
 
-        app.UseAuthorization();
-        app.MapRazorPages().RequireAuthorization();
+    app.UseIdentityServer();
+
+    app.UseAuthorization();
+    app.MapRazorPages().RequireAuthorization();
 
 
     app.Run();

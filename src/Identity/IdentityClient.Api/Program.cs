@@ -1,3 +1,6 @@
+using IdentityClient.Api.Pages.Catalog;
+using Microsoft.Extensions.Configuration;
+
 namespace MvcClient
 {
     public class Program
@@ -5,6 +8,8 @@ namespace MvcClient
         public static void Main(string[] args)
         {
             var builder = WebApplication.CreateBuilder(args);
+
+            builder.Services.Configure<CatalogConfiguration>(builder.Configuration.GetSection("ApiConfiguration:CatalogConfiguration"));
 
             builder.Services.AddRazorPages();
 
@@ -16,11 +21,11 @@ namespace MvcClient
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
-                    options.Authority = "https://localhost:5001";
+                    options.Authority = builder.Configuration.GetValue<string>("IdentityConfiguration:Authority");
 
-                    options.ClientId = "identityClient";
-                    options.ClientSecret = "secret";
-                    options.ResponseType = "code";
+                    options.ClientId = builder.Configuration.GetValue<string>("IdentityConfiguration:ClientId");
+                    options.ClientSecret = builder.Configuration.GetValue<string>("IdentityConfiguration:ClientSecret");
+                    options.ResponseType = builder.Configuration.GetValue<string>("IdentityConfiguration:ResponseType");
 
                     options.SaveTokens = true;
 

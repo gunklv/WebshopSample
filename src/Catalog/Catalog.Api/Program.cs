@@ -16,7 +16,7 @@ namespace Catalog.Api
             builder.Services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
-                    options.Authority = "https://localhost:5001";
+                    options.Authority = builder.Configuration.GetValue<string>("IdentityConfiguration:Authority");
 
                     options.TokenValidationParameters = new TokenValidationParameters
                     {

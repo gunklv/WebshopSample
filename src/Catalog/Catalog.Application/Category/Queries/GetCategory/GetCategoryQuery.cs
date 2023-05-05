@@ -2,7 +2,7 @@
 
 namespace Catalog.Application.Category.Queries.GetCategory
 {
-    public class GetCategoryQuery : IRequest<Domain.Aggregates.Category>
+    public class GetCategoryQuery : IRequest<Domain.CategoryAggregate.Category>
     {
         public Guid Id { get; set; }
     }

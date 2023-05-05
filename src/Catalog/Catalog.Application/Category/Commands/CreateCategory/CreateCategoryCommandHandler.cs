@@ -1,34 +1,45 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Category.Commands.CreateCategory
 {
-    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Domain.Aggregates.Category>
+    internal class CreateCategoryCommandHandler : IRequestHandler<CreateCategoryCommand, Domain.CategoryAggregate.Category>
     {
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateCategoryCommandHandler(IRepository<Domain.Aggregates.Category> categoryRepository)
+        public CreateCategoryCommandHandler(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Domain.Aggregates.Category> Handle(CreateCategoryCommand createCategoryCommand, CancellationToken cancellationToken)
+        public async Task<Domain.CategoryAggregate.Category> Handle(CreateCategoryCommand createCategoryCommand, CancellationToken cancellationToken)
         {
-            Domain.Aggregates.Category parentCategory = null;
-            if (createCategoryCommand.ParentId != null)
+            await _unitOfWork.BeginAsync();
+            try
             {
-                parentCategory = await _categoryRepository.GetByIdAsync(createCategoryCommand.ParentId);
-                if (parentCategory == null)
-                    throw new CategoryNotFoundException(
-                        $"Could not found ParentCategory with id: {createCategoryCommand.ParentId} for Category creation.");
+                Domain.CategoryAggregate.Category parentCategory = null;
+                if (createCategoryCommand.ParentId != null)
+                {
+                    parentCategory = await _unitOfWork.CategoryRepository.GetByIdAsync(createCategoryCommand.ParentId);
+                    if (parentCategory == null)
+                        throw new CategoryNotFoundException(
+                            $"Could not found ParentCategory with id: {createCategoryCommand.ParentId} for Category creation.");
+                }
+
+                var category = new Domain.CategoryAggregate.Category(null, createCategoryCommand.Name, createCategoryCommand.ImageUrl, parentCategory);
+
+                var insertedCategory = await _unitOfWork.CategoryRepository.InsertAsync(category);
+
+                await _unitOfWork.CommitAsync();
+
+                return insertedCategory;
             }
-
-            var category = new Domain.Aggregates.Category(null, createCategoryCommand.Name, createCategoryCommand.ImageUrl, parentCategory);
-
-            var insertedCategory = await _categoryRepository.InsertAsync(category);
-
-            return insertedCategory;
+            catch(Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

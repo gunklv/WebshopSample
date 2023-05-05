@@ -1,33 +1,42 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Item.Commands.CreateItem
 {
-    internal class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, Domain.Aggregates.Item>
+    internal class CreateItemCommandHandler : IRequestHandler<CreateItemCommand, Domain.ItemAggregate.Item>
     {
-        private readonly IItemRepository _itemRepository;
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public CreateItemCommandHandler(
-            IItemRepository itemRepository,
-            IRepository<Domain.Aggregates.Category> categoryRepository)
+        public CreateItemCommandHandler(IUnitOfWork unitOfWork)
         {
-            _itemRepository = itemRepository;
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Domain.Aggregates.Item> Handle(CreateItemCommand createItemCommand, CancellationToken cancellationToken)
+        public async Task<Domain.ItemAggregate.Item> Handle(CreateItemCommand createItemCommand, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetByIdAsync(createItemCommand.CategoryId);
-            if (category == null)
-                throw new CategoryNotFoundException(
-                    $"Could not found Category with id: {createItemCommand.CategoryId} for Item creation.");
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(createItemCommand.CategoryId);
+                if (category == null)
+                    throw new CategoryNotFoundException(
+                        $"Could not found Category with id: {createItemCommand.CategoryId} for Item creation.");
 
-            var item = new Domain.Aggregates.Item(
-                null, createItemCommand.Name, createItemCommand.Description, createItemCommand.ImageUrl, createItemCommand.Price, createItemCommand.Amount, category);
+                var item = new Domain.ItemAggregate.Item(
+                    null, createItemCommand.Name, createItemCommand.Description, createItemCommand.ImageUrl, createItemCommand.Price, createItemCommand.Amount, category.Id);
 
-            return await _itemRepository.InsertAsync(item);
+                var insertedItem = await _unitOfWork.ItemRepository.InsertAsync(item);
+
+                await _unitOfWork.CommitAsync();
+
+                return insertedItem;
+            }
+            catch(Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

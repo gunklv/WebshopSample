@@ -1,27 +1,35 @@
 ﻿using Catalog.Application.Item.Commands.DeleteItem;
 using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
 using MediatR;
 
 namespace Catalog.Application.Shared.DeleteItem
 {
     internal class DeleteItemCommandHandler : IRequestHandler<DeleteItemCommand>
     {
-        private readonly IItemRepository _itemRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public DeleteItemCommandHandler(IItemRepository itemRepository)
+        public DeleteItemCommandHandler(IUnitOfWork unitOfWork)
         {
-            _itemRepository = itemRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(DeleteItemCommand deleteItemCommand, CancellationToken cancellationToken)
         {
-            var item = await _itemRepository.GetByIdAsync(deleteItemCommand.Id);
-            if (item == null)
-                throw new ItemNotFoundException(
-                    $"Could not found Item with id: {deleteItemCommand.Id} for deleting Item.");
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                var item = await _unitOfWork.ItemRepository.GetByIdAsync(deleteItemCommand.Id);
+                if (item == null)
+                    throw new ItemNotFoundException(
+                        $"Could not found Item with id: {deleteItemCommand.Id} for deleting Item.");
 
-            await _itemRepository.DeleteAsync(deleteItemCommand.Id);
+                await _unitOfWork.ItemRepository.DeleteAsync(item);
+            }
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

@@ -1,40 +1,51 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Category.Commands.UpdateCategory
 {
-    internal class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Domain.Aggregates.Category>
+    internal class UpdateCategoryCommandHandler : IRequestHandler<UpdateCategoryCommand, Domain.CategoryAggregate.Category>
     {
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public UpdateCategoryCommandHandler(IRepository<Domain.Aggregates.Category> categoryRepository)
+        public UpdateCategoryCommandHandler(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Domain.Aggregates.Category> Handle(UpdateCategoryCommand updateCategoryCommand, CancellationToken cancellationToken)
+        public async Task<Domain.CategoryAggregate.Category> Handle(UpdateCategoryCommand updateCategoryCommand, CancellationToken cancellationToken)
         {
-            var category = await _categoryRepository.GetByIdAsync(updateCategoryCommand.Id);
-
-            if(category == null)
-                throw new CategoryNotFoundException($"Could not found Category with id: {updateCategoryCommand.Id} for updating Category.");
-
-            Domain.Aggregates.Category parentCategory = null;
-            if(updateCategoryCommand.ParentId != null)
+            await _unitOfWork.BeginAsync();
+            try
             {
-                parentCategory = await _categoryRepository.GetByIdAsync(updateCategoryCommand.ParentId);
+                var category = await _unitOfWork.CategoryRepository.GetByIdAsync(updateCategoryCommand.Id);
 
-                if(parentCategory == null)
-                    throw new CategoryNotFoundException(
-                        $"Could not found ParentCategory with id: {updateCategoryCommand.ParentId} for updating Category with id: {updateCategoryCommand.Id}.");
+                if (category == null)
+                    throw new CategoryNotFoundException($"Could not found Category with id: {updateCategoryCommand.Id} for updating Category.");
+
+                Domain.CategoryAggregate.Category parentCategory = null;
+                if (updateCategoryCommand.ParentId != null)
+                {
+                    parentCategory = await _unitOfWork.CategoryRepository.GetByIdAsync(updateCategoryCommand.ParentId);
+
+                    if (parentCategory == null)
+                        throw new CategoryNotFoundException(
+                            $"Could not found ParentCategory with id: {updateCategoryCommand.ParentId} for updating Category with id: {updateCategoryCommand.Id}.");
+                }
+
+                category.UpdateProperties(parentCategory, updateCategoryCommand.Name, updateCategoryCommand.ImageUrl);
+
+                var updatedCategory = await _unitOfWork.CategoryRepository.UpdateAsync(category);
+
+                await _unitOfWork.CommitAsync();
+
+                return updatedCategory;
             }
-
-            category.Name= updateCategoryCommand.Name;
-            category.ImageUrl = updateCategoryCommand.ImageUrl;
-            category.ParentCategory = parentCategory;
-
-            return await _categoryRepository.UpdateAsync(category);
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

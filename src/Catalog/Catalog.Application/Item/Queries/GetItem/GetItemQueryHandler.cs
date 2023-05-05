@@ -1,26 +1,35 @@
-﻿using Catalog.Application.Shared.Exceptions;
-using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
+using Catalog.Application.Shared.Exceptions;
 using MediatR;
 
 namespace Catalog.Application.Item.Queries.GetItem
 {
-    internal class GetItemQueryHandler : IRequestHandler<GetItemQuery, Domain.Aggregates.Item>
+    internal class GetItemQueryHandler : IRequestHandler<GetItemQuery, Domain.ItemAggregate.Item>
     {
-        private readonly IItemRepository _itemRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public GetItemQueryHandler(IItemRepository itemRepository)
+        public GetItemQueryHandler(IUnitOfWork unitOfWork)
         {
-            _itemRepository = itemRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<Domain.Aggregates.Item> Handle(GetItemQuery getItemQuery, CancellationToken cancellationToken)
+        public async Task<Domain.ItemAggregate.Item> Handle(GetItemQuery getItemQuery, CancellationToken cancellationToken)
         {
-            var item = await _itemRepository.GetByIdAsync(getItemQuery.Id);
-            if (item == null)
-                throw new ItemNotFoundException(
-                    $"Could not found Item with id: {getItemQuery.Id}.");
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                var item = await _unitOfWork.ItemRepository.GetByIdAsync(getItemQuery.Id);
+                if (item == null)
+                    throw new ItemNotFoundException(
+                        $"Could not found Item with id: {getItemQuery.Id}.");
 
-            return item;
+                return item;
+            }
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

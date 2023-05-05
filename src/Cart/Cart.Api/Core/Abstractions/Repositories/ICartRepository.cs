@@ -5,11 +5,9 @@ namespace Cart.Api.Core.Abstractions.Repositories
     public interface ICartRepository
     {
         Task InsertCartAsync(Domain.Cart cart);
-
         Task<Domain.Cart> GetCartAsync(string cartKey);
-
+        Task<IReadOnlyCollection<Domain.Cart>> GetAllCartsAsync();
         Task UpdateCartAsync(Domain.Cart cart);
-
         Task DeleteCartAsync(string cartKey);
     }
 }

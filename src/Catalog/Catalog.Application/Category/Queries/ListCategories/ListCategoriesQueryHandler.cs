@@ -1,20 +1,29 @@
-﻿using Catalog.Domain.Abstractions;
+﻿using Catalog.Application.Shared;
 using MediatR;
 
 namespace Catalog.Application.Category.Queries.ListCategories
 {
-    internal class ListCategoriesQueryHandler : IRequestHandler<ListCategoriesQuery, IReadOnlyCollection<Domain.Aggregates.Category>>
+    internal class ListCategoriesQueryHandler : IRequestHandler<ListCategoriesQuery, IReadOnlyCollection<Domain.CategoryAggregate.Category>>
     {
-        private readonly IRepository<Domain.Aggregates.Category> _categoryRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public ListCategoriesQueryHandler(IRepository<Domain.Aggregates.Category> categoryRepository)
+        public ListCategoriesQueryHandler(IUnitOfWork unitOfWork)
         {
-            _categoryRepository = categoryRepository;
+            _unitOfWork = unitOfWork;
         }
 
-        public async Task<IReadOnlyCollection<Domain.Aggregates.Category>> Handle(ListCategoriesQuery listCategoriesQuery, CancellationToken cancellationToken)
+        public async Task<IReadOnlyCollection<Domain.CategoryAggregate.Category>> Handle(ListCategoriesQuery listCategoriesQuery, CancellationToken cancellationToken)
         {
-            return await _categoryRepository.GetAllAsync();
+            await _unitOfWork.BeginAsync();
+            try
+            {
+                return await _unitOfWork.CategoryRepository.GetAllAsync();
+            }
+            catch (Exception)
+            {
+                _unitOfWork.Rollback();
+                throw;
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-﻿using Cart.Api.Infrastructure.Configurations;
+﻿using Cart.Api.Infrastructure.Integrations.Persistance.MongoDb.Repositories.Configurations;
 using Testcontainers.MongoDb;
 
 namespace Cart.ComponentTests.Infrastructure.TestContainerInitializers.MongoDb
@@ -25,8 +25,8 @@ namespace Cart.ComponentTests.Infrastructure.TestContainerInitializers.MongoDb
             await _container.DisposeAsync();
         }
 
-        public PersistenceConfiguration GetConfiguration()
-            => new PersistenceConfiguration
+        public Api.Infrastructure.Integrations.Persistance.MongoDb.Repositories.Configurations.MongoDbConfiguration GetConfiguration()
+            => new Api.Infrastructure.Integrations.Persistance.MongoDb.Repositories.Configurations.MongoDbConfiguration
             {
                 ConnectionString = _container.GetConnectionString(),
                 DatabaseName = DatabaseName

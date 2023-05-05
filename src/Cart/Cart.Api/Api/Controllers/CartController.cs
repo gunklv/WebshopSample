@@ -100,7 +100,7 @@ namespace Cart.Api.Api.Controllers
         /// <remarks>
         /// Sample request:
         ///
-        ///     GET /api/v1/carts/{cartKey}/items
+        ///     GET /api/v2/carts/{cartKey}/items
         ///
         /// </remarks>
         /// <response code="200">If the operation was succesful.</response>

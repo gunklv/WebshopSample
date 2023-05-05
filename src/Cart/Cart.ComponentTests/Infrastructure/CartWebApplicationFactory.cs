@@ -4,7 +4,7 @@ using Xunit;
 using Microsoft.AspNetCore.Hosting;
 using Cart.ComponentTests.Infrastructure.TestContainerInitializers.MongoDb;
 using Microsoft.Extensions.DependencyInjection;
-using Cart.Api.Infrastructure.Configurations;
+using Cart.Api.Infrastructure.Integrations.Persistance.MongoDb.Repositories.Configurations;
 
 namespace Cart.ComponentTests.Infrastructure
 {
@@ -15,7 +15,7 @@ namespace Cart.ComponentTests.Infrastructure
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
             var mongoPersistenceConfiguration = MongoDbTestContainer.GetConfiguration();
-            builder.ConfigureServices(services => services.Configure<PersistenceConfiguration>(
+            builder.ConfigureServices(services => services.Configure<MongoDbConfiguration>(
                 x =>
                 {
                     x.ConnectionString = mongoPersistenceConfiguration.ConnectionString;

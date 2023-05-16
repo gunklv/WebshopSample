@@ -98,7 +98,7 @@ services:
       
   identity-server:
     restart: always
-    build: ..\src\identity\IdentityServer.api
+    build: ..\src\identity\IdentityServer.Api
     ports:
       - "5011:80"
     depends_on:

@@ -41,13 +41,21 @@ namespace Catalog.IntegrationEventSenderHost
 
         private static IConfiguration CreateConfiguration()
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json");
+            var builder = new ConfigurationBuilder();
 
-            if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "prod")
+            if (Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "prod")
             {
-                builder.AddJsonFile("appsettings.prod.json");
+                Console.WriteLine("PROD");
+                builder
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.prod.json");
+            }
+            else
+            {
+                Console.WriteLine("TEST");
+                builder
+                    .SetBasePath(Directory.GetCurrentDirectory())
+                    .AddJsonFile("appsettings.json");
             }
 
             return builder.Build();

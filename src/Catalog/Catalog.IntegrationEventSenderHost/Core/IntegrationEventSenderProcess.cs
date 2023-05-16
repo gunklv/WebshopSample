@@ -26,6 +26,8 @@ namespace Catalog.IntegrationEventSenderHost.Core
         {
             while (!cancellatonToken.IsCancellationRequested)
             {
+                _logger.LogInformation("Polling");
+
                 var nonProcessedIntegrationEvents = await _integrationEventOutboxRepository.GetAllNotProcessedIntegrationEventsAsync();
 
                 foreach (var integrationEvent in nonProcessedIntegrationEvents)

@@ -1,3 +1,4 @@
+using IdentityClient.Api.Pages.Account;
 using IdentityClient.Api.Pages.Catalog;
 using Microsoft.Extensions.Configuration;
 
@@ -10,6 +11,7 @@ namespace MvcClient
             var builder = WebApplication.CreateBuilder(args);
 
             builder.Services.Configure<CatalogConfiguration>(builder.Configuration.GetSection("ApiConfiguration:CatalogConfiguration"));
+            builder.Services.Configure<ProfileConfiguration>(x => x.BaseUrl = builder.Configuration.GetValue<string>("IdentityConfiguration:Authority"));
 
             builder.Services.AddRazorPages();
 
@@ -21,6 +23,7 @@ namespace MvcClient
                 .AddCookie("Cookies")
                 .AddOpenIdConnect("oidc", options =>
                 {
+                    options.RequireHttpsMetadata = false;
                     options.Authority = builder.Configuration.GetValue<string>("IdentityConfiguration:Authority");
 
                     options.ClientId = builder.Configuration.GetValue<string>("IdentityConfiguration:ClientId");
@@ -40,6 +43,11 @@ namespace MvcClient
                 });
 
             var app = builder.Build();
+
+            app.UseCookiePolicy(new CookiePolicyOptions
+            {
+                MinimumSameSitePolicy = SameSiteMode.Lax
+            });
 
             if (!app.Environment.IsDevelopment())
             {

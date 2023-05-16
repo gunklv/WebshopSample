@@ -35,7 +35,7 @@ namespace Catalog.IntegrationEventSenderHost
             finally
             {
                 Console.Write("Press any key to exit...");
-                Console.ReadKey();
+                Console.Read();
             }
         }
 
@@ -44,6 +44,11 @@ namespace Catalog.IntegrationEventSenderHost
             var builder = new ConfigurationBuilder()
                 .SetBasePath(Directory.GetCurrentDirectory())
                 .AddJsonFile("appsettings.json");
+
+            if(Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") == "prod")
+            {
+                builder.AddJsonFile("appsettings.prod.json");
+            }
 
             return builder.Build();
         }

@@ -20,6 +20,7 @@ namespace Cart.Api
             builder.Services.AddAuthentication("Bearer")
                 .AddJwtBearer("Bearer", options =>
                 {
+                    options.RequireHttpsMetadata = false;
                     options.Authority = builder.Configuration.GetValue<string>("IdentityConfiguration:Authority");
 
                     options.TokenValidationParameters = new TokenValidationParameters

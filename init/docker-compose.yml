@@ -14,7 +14,7 @@ services:
     image: mongo-express
     restart: always
     ports:
-      - 8099:8081
+      - "8099:8081"
     depends_on:
       - mongo
     environment:
@@ -27,11 +27,9 @@ services:
       POSTGRES_DB: catalog
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes: 
-      - db:/var/lib/postgresql/catalog-data
       - ./docker-entrypoint-initdb.d/postgres-catalog-init.sql:/docker-entrypoint-initdb.d/postgres-init.sql
       
   postgres-identity:
@@ -41,11 +39,8 @@ services:
       POSTGRES_DB: identity
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: admin
-      
     ports:
-      - '5433:5432'
-    volumes: 
-      - db:/var/lib/postgresql/identity-data
+      - "5433:5432"
 
   pgadmin:
     image: dpage/pgadmin4
@@ -77,17 +72,18 @@ services:
     depends_on:
       - zookeeper
     ports:
-      - '9092:9092'
+      - "9092:9092"
     expose:
-      - '29092'
+      - "29092"
     environment:
       KAFKA_BROKER_ID: 1
-      KAFKA_ZOOKEEPER_CONNECT: 'zookeeper:2181'
+      KAFKA_ZOOKEEPER_CONNECT: "zookeeper:2181"
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://172.30.224.1:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_MIN_INSYNC_REPLICAS: '1'
+      KAFKA_MIN_INSYNC_REPLICAS: "1"
+    command: sh -c "((sleep 30 && kafka-topics --create --zookeeper zookeeper:2181 --replication-factor 1 --partitions 1 --topic catalog)&) && /etc/confluent/docker/run ">
 
   kafdrop:
     image: obsidiandynamics/kafdrop
@@ -100,6 +96,54 @@ services:
     depends_on:
       - "kafka"
       
-volumes:
-  db:
-    driver: local
+  identity-server:
+    restart: always
+    build: ..\src\identity\IdentityServer.api
+    ports:
+      - "5011:80"
+    depends_on:
+      - "postgres-identity"
+    environment:
+      aspnetcore_environment: "prod"
+  
+  identity-client:
+    restart: always
+    build: ..\src\Identity\IdentityClient.Api
+    ports:
+      - "5012:80"
+    depends_on:
+      - "identity-server"
+    environment:
+      aspnetcore_environment: "prod"
+      
+  catalog-api:
+    restart: always
+    build:
+      dockerfile: /Catalog.Api/Dockerfile
+      context: ../src/Catalog
+    ports:
+      - "5013:80"
+    depends_on:
+      - "postgres-catalog"
+      - "kafka"
+    environment:
+      aspnetcore_environment: "prod"
+      
+  catalog-eventsender:
+    restart: always
+    build: ..\src\Catalog\Catalog.Integrationeventsenderhost
+    depends_on:
+      - "postgres-catalog"
+      - "kafka"
+    environment:
+      aspnetcore_environment: "prod"
+    
+  cart-api:
+    restart: always
+    build: ..\src\Cart\Cart.Api
+    ports:
+      - "5014:80"
+    depends_on:
+      - "mongo"
+    environment:
+      aspnetcore_environment: "prod"

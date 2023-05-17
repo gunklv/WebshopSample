@@ -41,6 +41,7 @@ namespace Cart.Api.Api.Controllers
         ///
         /// </remarks>
         /// <response code="200">If the operation was succesful.</response>
+        /// <response code="401">If the user is not authenticated.</response>
         /// <response code="500">If an unexpected issue happened during the operation.</response>
         [HttpPost]
         [MapToApiVersion("1.0")]
@@ -67,6 +68,7 @@ namespace Cart.Api.Api.Controllers
         /// </remarks>
         /// <response code="200">If the operation was succesful.</response>
         /// <response code="400">If there was not a Cart with the corresponding cartKey.</response>
+        /// <response code="401">If the user is not authenticated.</response>
         /// <response code="500">If an unexpected issue happened during the operation.</response>
         [HttpGet]
         [MapToApiVersion("1.0")]
@@ -105,6 +107,7 @@ namespace Cart.Api.Api.Controllers
         /// </remarks>
         /// <response code="200">If the operation was succesful.</response>
         /// <response code="400">If there was not a Cart with the corresponding cartKey.</response>
+        /// <response code="401">If the user is not authenticated.</response>
         /// <response code="500">If an unexpected issue happened during the operation.</response>
         [HttpGet]
         [MapToApiVersion("2.0")]
@@ -138,6 +141,7 @@ namespace Cart.Api.Api.Controllers
         /// </remarks>
         /// <response code="200">If the operation was succesful.</response>
         /// <response code="400">If there was not a Cart with the corresponding cartKey.</response>
+        /// <response code="401">If the user is not authenticated.</response>
         /// <response code="500">If an unexpected issue happened during the operation.</response>
         [HttpDelete]
         [MapToApiVersion("1.0")]

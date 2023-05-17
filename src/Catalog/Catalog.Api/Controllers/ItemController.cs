@@ -6,6 +6,7 @@ using Catalog.Api.Utilities.Hateoas.Attributes;
 using Catalog.Application.Item.Commands.DeleteItem;
 using Catalog.Application.Item.Queries.GetItem;
 using MediatR;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Catalog.Api.Controllers
@@ -24,6 +25,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Manager")]
         [Route("", Name = "CreateItem")]
         [Link(nameof(GetItemAsync), "itemId")]
         [Link(nameof(UpdateItemAsync), "itemId")]
@@ -44,6 +46,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Manager, Buyer")]
         [Route("{itemId}", Name = "GetItem")]
         [Link(nameof(GetItemAsync), "itemId")]
         [Link(nameof(UpdateItemAsync), "itemId")]
@@ -57,6 +60,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Manager, Buyer")]
         public async Task<IActionResult> ListItemsAsync([FromQuery] ListItemsQueryRequest listItemsQueryRequest)
         {
             var listItemsQuery = _itemMapper.Map(listItemsQueryRequest);
@@ -68,6 +72,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpPut]
+        [Authorize(Roles = "Manager")]
         [Route("{itemId}", Name = "UpdateItem")]
         [Link(nameof(GetItemAsync), "itemId")]
         [Link(nameof(UpdateItemAsync), "itemId")]
@@ -88,6 +93,7 @@ namespace Catalog.Api.Controllers
         }
 
         [HttpDelete]
+        [Authorize(Roles = "Manager")]
         [Route("{itemId}", Name = "DeleteItem")]
         [Link(nameof(CreateItemAsync), "")]
         public async Task<IActionResult> DeleteItemAsync([FromRoute][NotDefault] long itemId)

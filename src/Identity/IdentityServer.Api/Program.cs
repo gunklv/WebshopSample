@@ -48,6 +48,19 @@ try
 
     var app = builder.Build();
 
+    app.UseCookiePolicy(new CookiePolicyOptions
+    {
+        MinimumSameSitePolicy = SameSiteMode.Lax
+    });
+
+    using (var scope = app.Services.CreateScope())
+    {
+        var dbContext = scope.ServiceProvider
+            .GetRequiredService<AccountDbContext>();
+
+        dbContext.Database.Migrate();
+    }
+
     app.UseSerilogRequestLogging();
 
     app.UseStaticFiles();

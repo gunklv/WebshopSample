@@ -3,8 +3,8 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
-using Newtonsoft.Json.Linq;
 using System.IdentityModel.Tokens.Jwt;
 
 namespace IdentityClient.Api.Pages.Account;
@@ -12,6 +12,13 @@ namespace IdentityClient.Api.Pages.Account;
 [Authorize]
 public class ProfileModel : PageModel
 {
+    private readonly IOptions<ProfileConfiguration> _profileConfiguration;
+
+    public ProfileModel(IOptions<ProfileConfiguration> profileConfiguration)
+    {
+        _profileConfiguration = profileConfiguration;
+    }
+
     public async Task<IActionResult> OnGet()
     {
         var accessToken = await HttpContext.GetTokenAsync("access_token");
@@ -30,7 +37,7 @@ public class ProfileModel : PageModel
 
         var tokenResponse = await client.RequestRefreshTokenAsync(new RefreshTokenRequest
         {
-            Address = "https://localhost:5001/connect/token",
+            Address = $"{_profileConfiguration.Value.BaseUrl}/connect/token",
             ClientId = "identityClient",
             ClientSecret = "secret",
             RefreshToken = refreshToken,

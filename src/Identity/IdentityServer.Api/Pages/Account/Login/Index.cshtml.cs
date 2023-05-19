@@ -60,7 +60,6 @@ public class Index : PageModel
             {
                 var isuser = new IdentityServerUser(user.Id)
                 {
-                    //AdditionalClaims = new List<Claim>() { new Claim("role", (await _userManager.GetRolesAsync(user)).First()) },
                     DisplayName = user.UserName
                 };
 

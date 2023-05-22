@@ -110,9 +110,21 @@ namespace Cart.Api
 
             app.UseMiddleware<IdentityTokenLoggerMiddleware>();
 
-            app.MapControllers().RequireAuthorization("RequireManagerOrBuyerRole");
+            if(app.Environment.EnvironmentName == Environments.AutomationTest)
+            {
+                app.MapControllers();
+            }
+            else
+            {
+                app.MapControllers().RequireAuthorization("RequireManagerOrBuyerRole");
+            }
 
             app.Run();
         }
+    }
+
+    public static class Environments
+    {
+        public const string AutomationTest = "AutomationTest";
     }
 }

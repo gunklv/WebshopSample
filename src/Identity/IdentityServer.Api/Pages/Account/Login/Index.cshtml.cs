@@ -31,7 +31,7 @@ public class Index : PageModel
         _userManager = userManager;
     }
 
-    public async Task<IActionResult> OnGet(string returnUrl)
+    public IActionResult OnGet(string returnUrl)
     {
         Input = new InputModel
         {

@@ -110,14 +110,14 @@ namespace Cart.Api
 
             app.UseMiddleware<IdentityTokenLoggerMiddleware>();
 
-            //if(app.Environment.EnvironmentName == Environments.AutomationTest)
-            //{
-            //    app.MapControllers();
-            //}
-            //else
-            //{
+            if(app.Environment.EnvironmentName == Environments.AutomationTest)
+            {
+                app.MapControllers();
+            }
+            else
+            {
                 app.MapControllers().RequireAuthorization("RequireManagerOrBuyerRole");
-            //}
+            }
 
             app.Run();
         }

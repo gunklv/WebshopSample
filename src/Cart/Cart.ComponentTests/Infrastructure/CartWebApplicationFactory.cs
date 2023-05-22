@@ -14,6 +14,8 @@ namespace Cart.ComponentTests.Infrastructure
 
         protected override void ConfigureWebHost(IWebHostBuilder builder)
         {
+            builder.UseEnvironment(Environments.AutomationTest);
+
             var mongoPersistenceConfiguration = MongoDbTestContainer.GetConfiguration();
             builder.ConfigureServices(services => services.Configure<MongoDbConfiguration>(
                 x =>

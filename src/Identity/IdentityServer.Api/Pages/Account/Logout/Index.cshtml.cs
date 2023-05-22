@@ -33,26 +33,14 @@ public class Index : PageModel
 
     public async Task<IActionResult> OnPost()
     {
-            LogoutId ??= await _interaction.CreateLogoutContextAsync();
+        LogoutId ??= await _interaction.CreateLogoutContextAsync();
 
-            var schemes = await _schemeProvider.GetAllSchemesAsync();
+        var schemes = await _schemeProvider.GetAllSchemesAsync();
 
-            foreach (var scheme in schemes)
-            {
-                await HttpContext.SignOutAsync(scheme.Name);
-            }
-
-            var idp = User.FindFirst(JwtClaimTypes.IdentityProvider)?.Value;
-
-            if (idp != null && idp != Duende.IdentityServer.IdentityServerConstants.LocalIdentityProvider)
-            {
-                if (await HttpContext.GetSchemeSupportsSignOutAsync(idp))
-                {
-                    string url = Url.Page("/Account/Logout/Loggedout", new { logoutId = LogoutId });
-
-                    return SignOut(new AuthenticationProperties { RedirectUri = url }, idp);
-                }
-            }
+        foreach (var scheme in schemes)
+        {
+            await HttpContext.SignOutAsync(scheme.Name);
+        }
 
         var logout = await _interaction.GetLogoutContextAsync(LogoutId);
 

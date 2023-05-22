@@ -43,6 +43,30 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "IdentityServer.Api", "Ident
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Catalog.Infrastructure", "Catalog\Catalog.Infrastructure\Catalog.Infrastructure.csproj", "{9FBAEA90-C20A-4151-8731-D9AC8D8AA890}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{050517E2-2A0D-4480-B3C6-3609BB894AB2}"
+	ProjectSection(SolutionItems) = preProject
+		..\.dockerignore = ..\.dockerignore
+		..\.gitignore = ..\.gitignore
+		..\README.md = ..\README.md
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "workflows", "workflows", "{00C042ED-8F16-44A0-A27E-E72DE1A63FC2}"
+	ProjectSection(SolutionItems) = preProject
+		..\.github\workflows\build-and-test.yml = ..\.github\workflows\build-and-test.yml
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "init", "init", "{505D5072-9634-4FD5-9A47-43298D7F874A}"
+	ProjectSection(SolutionItems) = preProject
+		..\init\docker-compose.yml = ..\init\docker-compose.yml
+		..\init\init.ps1 = ..\init\init.ps1
+	EndProjectSection
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "docker-entrypoint-initdb.d", "docker-entrypoint-initdb.d", "{E1D7AE18-05CE-4575-B4DA-F3275C4A889C}"
+	ProjectSection(SolutionItems) = preProject
+		..\init\docker-entrypoint-initdb.d\mongo-init.js = ..\init\docker-entrypoint-initdb.d\mongo-init.js
+		..\init\docker-entrypoint-initdb.d\postgres-catalog-init.sql = ..\init\docker-entrypoint-initdb.d\postgres-catalog-init.sql
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -124,6 +148,9 @@ Global
 		{15DA2848-93A1-4080-B33B-34C5996D941B} = {FBF284FC-A5E6-4A68-A3C0-F683CDEA9F08}
 		{D59088A3-1252-4080-B5B7-F178D10C11DE} = {FBF284FC-A5E6-4A68-A3C0-F683CDEA9F08}
 		{9FBAEA90-C20A-4151-8731-D9AC8D8AA890} = {765CE549-5F4F-48CE-9E67-659C1CB7D6D8}
+		{00C042ED-8F16-44A0-A27E-E72DE1A63FC2} = {050517E2-2A0D-4480-B3C6-3609BB894AB2}
+		{505D5072-9634-4FD5-9A47-43298D7F874A} = {050517E2-2A0D-4480-B3C6-3609BB894AB2}
+		{E1D7AE18-05CE-4575-B4DA-F3275C4A889C} = {505D5072-9634-4FD5-9A47-43298D7F874A}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {CA42EABC-A2B8-4D2A-8CB7-5E825AAAA9FD}

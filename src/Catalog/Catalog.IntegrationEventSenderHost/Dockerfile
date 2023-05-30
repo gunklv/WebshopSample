@@ -5,8 +5,8 @@ WORKDIR /app
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src/Catalog/Catalog.IntegrationEventSenderHost
-COPY ["/Catalog.IntegrationEventSenderHost.csproj", "/"]
-RUN dotnet restore "/Catalog.IntegrationEventSenderHost.csproj"
+COPY ["/Catalog.IntegrationEventSenderHost.csproj", "./"]
+RUN dotnet restore "./Catalog.IntegrationEventSenderHost.csproj"
 COPY . .
 WORKDIR "/src/Catalog/Catalog.IntegrationEventSenderHost"
 RUN dotnet build "Catalog.IntegrationEventSenderHost.csproj" -c Release -o /app/build

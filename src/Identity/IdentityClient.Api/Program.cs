@@ -1,6 +1,5 @@
 using IdentityClient.Api.Pages.Account;
 using IdentityClient.Api.Pages.Catalog;
-using Microsoft.Extensions.Configuration;
 
 namespace MvcClient
 {

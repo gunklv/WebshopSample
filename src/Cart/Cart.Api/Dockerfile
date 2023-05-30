@@ -7,8 +7,8 @@ EXPOSE 443
 
 FROM mcr.microsoft.com/dotnet/sdk:6.0 AS build
 WORKDIR /src/Cart/Cart.Api
-COPY ["/Cart.Api.csproj", "/"]
-RUN dotnet restore "/Cart.Api.csproj"
+COPY ["/Cart.Api.csproj", "./"]
+RUN dotnet restore "./Cart.Api.csproj"
 COPY . .
 WORKDIR "/src/Cart/Cart.Api"
 RUN dotnet build "Cart.Api.csproj" -c Release -o /app/build

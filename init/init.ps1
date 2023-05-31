@@ -1,5 +1,14 @@
-﻿$ipAddress = (Get-NetIPConfiguration | Where-Object {$_.IPv4DefaultGateway -ne $null -and $_.NetAdapter.status -ne "Disconnected"}).IPv4Address.IPAddress[0]
+﻿$ipAddresses = (Get-NetIPConfiguration | Where-Object {$_.IPv4DefaultGateway -ne $null -and $_.NetAdapter.status -ne "Disconnected"}).IPv4Address.IPAddress
 
+if($ipAddresses.Count -gt 1) {
+ $ipAddress = $ipAddresses[0]
+}
+elseif ($ipAddresses.Count -eq 1){
+    $ipAddress = $ipAddresses
+}
+else {
+    throw [System.Exception] "IpAddress not found."
+}
 
 $matchString = '(?:[0-9]{1,3}\.){3}[0-9]{1,3}'
 $replaceString = $ipAddress
